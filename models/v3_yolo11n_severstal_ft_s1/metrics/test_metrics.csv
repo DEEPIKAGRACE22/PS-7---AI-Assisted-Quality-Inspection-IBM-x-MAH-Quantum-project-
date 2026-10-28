@@ -1,0 +1,2 @@
+Model,Dataset,Precision,Recall,mAP50,mAP50_95
+v3_yolo11n_severstal_ft_s1,data/neu_yolo/data.yaml,0.711876769025893,0.7055421104334147,0.7504446182105329,0.42034125321743876

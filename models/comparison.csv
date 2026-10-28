@@ -1,0 +1,4 @@
+Version,Runs,Precision,Recall,mAP50,mAP50_95,crazing_AP50,rolled-in_scale_AP50
+v1_yolo11n_baseline,1,0.748,0.681,0.758,0.413,0.391,0.697
+v1r_yolo11n_baseline_long,3,0.668 ± 0.025,0.730 ± 0.001,0.737 ± 0.016,0.407 ± 0.007,0.342 ± 0.016,0.607 ± 0.045
+v3_yolo11n_severstal_ft,3,0.720 ± 0.007,0.704 ± 0.008,0.747 ± 0.008,0.422 ± 0.011,0.393 ± 0.060,0.636 ± 0.052

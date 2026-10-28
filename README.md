@@ -168,5 +168,6 @@ Use the scripts above, or open `notebooks/v1_yolo11n_baseline_colab.ipynb` in Co
 - [x] Dataset audit and YOLO conversion
 - [x] Baseline detector (YOLO11n)
 - [x] Repo restructured into versioned models and reusable scripts
-- [ ] Transfer learning from Severstal: open `notebooks/v2_severstal_transfer_colab.ipynb` in Colab and Run all (see [`docs/SEVERSTAL_TRANSFER_PLAN.md`](docs/SEVERSTAL_TRANSFER_PLAN.md))
+- [x] Transfer learning from Severstal (`notebooks/v2_severstal_transfer_colab.ipynb`): small overall gain (mAP50-95 0.422 vs 0.407 control, within noise), crazing recall not improved. See [`docs/RESULTS_SEVERSTAL_TRANSFER.md`](docs/RESULTS_SEVERSTAL_TRANSFER.md)
+- [ ] Improve `crazing` and `rolled-in_scale`: label audit, CLAHE contrast enhancement, class oversampling
 - [ ] Production-line demonstration (real-time inference app)

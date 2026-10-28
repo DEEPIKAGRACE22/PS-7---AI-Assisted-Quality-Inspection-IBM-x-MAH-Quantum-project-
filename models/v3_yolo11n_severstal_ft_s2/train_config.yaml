@@ -1,0 +1,28 @@
+version: v3_yolo11n_severstal_ft_s2
+description: YOLO11n pretrained on Severstal (v2), fine-tuned on NEU-DET.
+model: models/v2_yolo11n_severstal_pretrain/weights/best.pt
+data: data/neu_yolo/data.yaml
+train:
+  epochs: 100
+  imgsz: 640
+  batch: 16
+  seed: 2
+  deterministic: true
+  patience: 20
+  workers: 2
+  optimizer: AdamW
+  lr0: 0.001
+  save_period: 10
+  hsv_h: 0.015
+  hsv_s: 0.3
+  hsv_v: 0.2
+  degrees: 3.0
+  translate: 0.05
+  scale: 0.15
+  shear: 1.0
+  mosaic: 0.5
+  mixup: 0.05
+  close_mosaic: 10
+  fliplr: 0.5
+  flipud: 0.0
+  device: 0
