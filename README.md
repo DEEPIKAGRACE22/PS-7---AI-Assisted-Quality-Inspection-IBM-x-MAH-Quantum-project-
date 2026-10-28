@@ -20,11 +20,14 @@ An object-detection model that locates and classifies surface defects on hot-rol
 ├── scripts/
 │   ├── prepare_neu_det.py    # download NEU-DET, convert to YOLO, fixed split
 │   ├── train.py              # train from a config, register under models/<version>/
+│   ├── prepare_severstal.py  # Severstal RLE masks -> boxes, 256x256 tiles
+│   ├── visualize_dataset.py  # draw labels on samples (sanity check)
 │   ├── evaluate.py           # test-set metrics (overall + per class)
+│   ├── compare.py            # compare versions, mean ± std over seeds
 │   └── predict.py            # run a version on images
 ├── models/                   # model registry (see models/README.md)
 │   └── v1_yolo11n_baseline/  # weights, config, metrics, model card
-├── notebooks/                # Colab notebooks (v1 original pipeline)
+├── notebooks/                # Colab runners (v1 original, v2 Severstal transfer)
 ├── docs/IMPROVEMENT_PLAN.md
 ├── data/                     # generated datasets (git-ignored)
 └── runs/                     # Ultralytics outputs (git-ignored)
@@ -165,5 +168,5 @@ Use the scripts above, or open `notebooks/v1_yolo11n_baseline_colab.ipynb` in Co
 - [x] Dataset audit and YOLO conversion
 - [x] Baseline detector (YOLO11n)
 - [x] Repo restructured into versioned models and reusable scripts
-- [ ] Transfer learning from other steel datasets (see [`docs/IMPROVEMENT_PLAN.md`](docs/IMPROVEMENT_PLAN.md))
+- [ ] Transfer learning from Severstal: open `notebooks/v2_severstal_transfer_colab.ipynb` in Colab and Run all (see [`docs/SEVERSTAL_TRANSFER_PLAN.md`](docs/SEVERSTAL_TRANSFER_PLAN.md))
 - [ ] Production-line demonstration (real-time inference app)
