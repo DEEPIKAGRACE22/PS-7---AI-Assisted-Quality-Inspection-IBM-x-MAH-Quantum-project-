@@ -1,0 +1,30 @@
+# v1 baseline: reproduces the original Colab run (notebooks/v1_yolo11n_baseline_colab.ipynb)
+version: v1_yolo11n_baseline
+description: YOLO11n from COCO weights, trained on NEU-DET with mild augmentation.
+
+model: yolo11n.pt          # COCO checkpoint, or a path such as models/<version>/weights/best.pt
+data: data/neu_yolo/data.yaml
+
+train:
+  epochs: 50
+  imgsz: 640
+  batch: 16
+  seed: 42
+  deterministic: true
+  patience: 10
+  workers: 2
+  optimizer: auto
+
+  # Augmentation
+  hsv_h: 0.015
+  hsv_s: 0.3
+  hsv_v: 0.2
+  degrees: 3.0
+  translate: 0.05
+  scale: 0.15
+  shear: 1.0
+  mosaic: 0.5
+  mixup: 0.05
+  close_mosaic: 10
+  fliplr: 0.5
+  flipud: 0.0

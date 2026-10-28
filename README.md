@@ -13,14 +13,24 @@ An object-detection model that locates and classifies surface defects on hot-rol
 | 4 | `rolled-in_scale` | Oxide scale pressed into the surface during rolling |
 | 5 | `scratches` | Linear abrasion marks |
 
-## Repository contents
+## Repository structure
 
-| File | Purpose |
-|------|---------|
-| `Untitled15 (5).ipynb` | **Main notebook.** Covers the full pipeline: download, audit, convert, train, evaluate, predict and export. |
-| `Untitled15 (4).ipynb` | Earlier version that only covers data preparation. Superseded by notebook (5). |
-| `best.pt` | Trained YOLO11n weights (best epoch by validation fitness). |
-| `ps7_test_metrics.csv` | Overall metrics on the held-out test set. |
+```
+├── configs/train/            # one YAML per model version (model, data, hyperparameters)
+├── scripts/
+│   ├── prepare_neu_det.py    # download NEU-DET, convert to YOLO, fixed split
+│   ├── train.py              # train from a config, register under models/<version>/
+│   ├── evaluate.py           # test-set metrics (overall + per class)
+│   └── predict.py            # run a version on images
+├── models/                   # model registry (see models/README.md)
+│   └── v1_yolo11n_baseline/  # weights, config, metrics, model card
+├── notebooks/                # Colab notebooks (v1 original pipeline)
+├── docs/IMPROVEMENT_PLAN.md
+├── data/                     # generated datasets (git-ignored)
+└── runs/                     # Ultralytics outputs (git-ignored)
+```
+
+Every model version is self-contained in `models/<version>/`. See [`models/README.md`](models/README.md) for the version table and naming rules.
 
 ## Dataset
 
@@ -107,15 +117,37 @@ The validation set gives similar scores: mAP@50 = 0.755 and mAP@50-95 = 0.390.
 ### Requirements
 
 ```bash
-pip install ultralytics kagglehub pyyaml opencv-python matplotlib pandas
+pip install -r requirements.txt
 ```
 
-### Inference with the trained model
+### Workflow
+
+```bash
+# 1. Build the dataset (data/neu_yolo)
+python scripts/prepare_neu_det.py
+
+# 2. Train a version from its config
+python scripts/train.py configs/train/v1_yolo11n_baseline.yaml
+
+# 3. Evaluate on the test split
+python scripts/evaluate.py v1_yolo11n_baseline
+
+# 4. Predict
+python scripts/predict.py v1_yolo11n_baseline path/to/images/
+```
+
+### Adding a new model version
+
+1. Copy a config in `configs/train/` and give it a new `version` name.
+2. To fine-tune from an existing version, set `model: models/<version>/weights/best.pt`.
+3. Train, evaluate, write `models/<new_version>/MODEL_CARD.md`, and add a row to `models/README.md`.
+
+### Inference from Python
 
 ```python
 from ultralytics import YOLO
 
-model = YOLO("best.pt")
+model = YOLO("models/v1_yolo11n_baseline/weights/best.pt")
 results = model.predict("path/to/steel_image.jpg", imgsz=640, conf=0.25, iou=0.45)
 
 for r in results:
@@ -126,12 +158,12 @@ for r in results:
 
 ### Reproducing training
 
-Open `Untitled15 (5).ipynb` in Google Colab with a GPU runtime and run all cells. The notebook paths assume Colab (`/content/...`), so edit them if you run it elsewhere.
+Use the scripts above, or open `notebooks/v1_yolo11n_baseline_colab.ipynb` in Colab with a GPU runtime. The notebook is the original record of the v1 run and uses Colab paths (`/content/...`).
 
 ## Roadmap
 
 - [x] Dataset audit and YOLO conversion
 - [x] Baseline detector (YOLO11n)
-- [ ] Model-improvement experiment, compared fairly against the baseline on the same test split and focused on `crazing` and `rolled-in_scale`
+- [x] Repo restructured into versioned models and reusable scripts
+- [ ] Transfer learning from other steel datasets (see [`docs/IMPROVEMENT_PLAN.md`](docs/IMPROVEMENT_PLAN.md))
 - [ ] Production-line demonstration (real-time inference app)
-- [ ] Refactor the notebooks into reusable scripts that do not depend on Colab
