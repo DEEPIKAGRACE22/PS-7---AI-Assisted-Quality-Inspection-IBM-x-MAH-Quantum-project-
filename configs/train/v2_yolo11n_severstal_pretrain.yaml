@@ -1,0 +1,30 @@
+# Stage A: pretrain on Severstal 256x256 tiles so the backbone learns steel textures.
+version: v2_yolo11n_severstal_pretrain
+description: YOLO11n from COCO weights, trained on Severstal tiles (4 classes).
+
+model: yolo11n.pt
+data: data/severstal_yolo/data.yaml
+
+train:
+  epochs: 30
+  imgsz: 256
+  batch: 64
+  seed: 42
+  deterministic: true
+  patience: 10
+  workers: 2
+  optimizer: auto
+  save_period: 5
+
+  # Steel defects have no fixed orientation
+  hsv_h: 0.0
+  hsv_s: 0.0
+  hsv_v: 0.2
+  degrees: 0.0
+  translate: 0.05
+  scale: 0.15
+  mosaic: 0.5
+  mixup: 0.0
+  close_mosaic: 5
+  fliplr: 0.5
+  flipud: 0.5
