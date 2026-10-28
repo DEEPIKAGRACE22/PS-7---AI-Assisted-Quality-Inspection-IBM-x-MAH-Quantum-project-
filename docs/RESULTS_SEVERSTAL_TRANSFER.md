@@ -39,7 +39,7 @@ v1r and v3 share the same schedule (AdamW, lr0 0.001, up to 100 epochs, patience
 2. **Early training is faster and more stable with pretraining.** Between epochs 5 and 16 v3 reaches higher mAP50 and fluctuates less. Both runs plateau at the same level by epoch 30–40.
 3. **Crazing improved in AP but not in recall.** v3's crazing AP50 is higher on average, but its crazing recall is lower (0.24–0.27 against 0.36–0.41). The AP gain comes from fewer false positives, so most crazing defects are still missed. Crazing AP50 varies from 0.34 to 0.46 across v3 seeds, and the test split has only 70 crazing instances.
 4. **rolled-in_scale:** a small gain (0.636 vs 0.607) that is inside the noise.
-5. **The original v1 matches or beats both.** It is a single run, and v1r and v3 changed the optimizer to a fixed-lr AdamW, which may have cost a little.
+5. **The original v1 cannot be told apart from v3.** On mAP50 it is higher (0.758 vs 0.747 mean); on mAP50-95 v3 seeds 0 and 1 are higher (0.433 and 0.420 vs 0.413). v1 is a single run, and v1r's seeds alone span 0.722–0.753 mAP50, so its score may be a lucky draw. v1r and v3 also use a fixed-lr AdamW instead of the default optimizer, which may have cost a little.
 6. **Latency is unchanged** at about 5 ms per image on a T4.
 
 ## Caveats
