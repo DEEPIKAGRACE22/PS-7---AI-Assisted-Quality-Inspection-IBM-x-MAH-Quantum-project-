@@ -189,6 +189,33 @@ python scripts/evaluate_all.py
 python scripts/export_dashboard_json.py
 ```
 
+## Backend API
+
+`backend.py` provides the dashboard data and image inference through FastAPI. Install the Python requirements and start it from the repository root:
+
+```bash
+pip install -r requirements.txt
+uvicorn backend:app --reload --port 8000
+```
+
+Open `http://localhost:8000/docs` for the interactive API page. The main endpoints are:
+
+- `GET /evaluation` — dashboard data in the format documented above
+- `GET /models` — available checkpoints and the default model
+- `POST /predict` — upload a steel-surface image for defect detection
+- `GET /health` — evaluation-data and model availability
+
+To connect the dashboard to the running backend:
+
+```bash
+cd dashboard
+EVAL_API_URL=http://localhost:8000/evaluation npm run dev
+```
+
+Upload limits can be configured with `MAX_UPLOAD_MB`, `MAX_IMAGE_WIDTH`,
+`MAX_IMAGE_HEIGHT`, and `MAX_IMAGE_PIXELS`. Their defaults are 10 MB, 4096 px,
+4096 px, and 16,777,216 pixels respectively.
+
 ## Roadmap
 
 - [x] Dataset audit and YOLO conversion
