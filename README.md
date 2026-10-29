@@ -24,7 +24,10 @@ An object-detection model that locates and classifies surface defects on hot-rol
 │   ├── visualize_dataset.py  # draw labels on samples (sanity check)
 │   ├── evaluate.py           # test-set metrics (overall + per class)
 │   ├── compare.py            # compare versions, mean ± std over seeds
+│   ├── evaluate_all.py       # every checkpoint on val + test -> reports/eval_all/
+│   ├── export_dashboard_json.py  # reports/eval_all/ -> dashboard/data/evaluation.json
 │   └── predict.py            # run a version on images
+├── dashboard/                # results dashboard (Next.js), see "Dashboard" below
 ├── models/                   # model registry (see models/README.md)
 │   └── v1_yolo11n_baseline/  # weights, config, metrics, model card
 ├── notebooks/                # Colab runners (v1 original, v2 Severstal transfer)
@@ -162,6 +165,29 @@ for r in results:
 ### Reproducing training
 
 Use the scripts above, or open `notebooks/v1_yolo11n_baseline_colab.ipynb` in Colab with a GPU runtime. The notebook is the original record of the v1 run and uses Colab paths (`/content/...`).
+
+## Dashboard
+
+`dashboard/` is a Next.js page that shows the evaluation results: the leaderboard, how much of each gap could be chance, per-class recall, and the casting classifier. It needs Node.js 22.18 or newer.
+
+```bash
+cd dashboard
+npm install
+npm run dev            # http://localhost:3000
+```
+
+By default it reads `dashboard/data/evaluation.json`. To read from a backend instead, set `EVAL_API_URL` to an endpoint that returns the same JSON:
+
+```bash
+EVAL_API_URL=http://localhost:8000/evaluation npm run dev
+```
+
+The response shape is documented in [`docs/DASHBOARD_API.md`](docs/DASHBOARD_API.md). After re-running the evaluation, refresh the bundled file:
+
+```bash
+python scripts/evaluate_all.py
+python scripts/export_dashboard_json.py
+```
 
 ## Roadmap
 
