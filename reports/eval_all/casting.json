@@ -1,0 +1,45 @@
+{
+  "dataset": "Kaggle casting_data/test",
+  "test_images": 715,
+  "reported_accuracy": 0.9947,
+  "models": [
+    {
+      "id": "casting_defect_classifier.keras",
+      "accuracy": 0.7636,
+      "auc": 0.8989,
+      "defective_recall": 0.6468,
+      "defective_precision": 0.9702,
+      "ok_recall": 0.9656,
+      "confusion_matrix": [
+        [
+          293,
+          160
+        ],
+        [
+          9,
+          253
+        ]
+      ],
+      "cpu_ms": 22.3
+    },
+    {
+      "id": "casting_defect_classifier_final.keras",
+      "accuracy": 0.7636,
+      "auc": 0.8989,
+      "defective_recall": 0.6468,
+      "defective_precision": 0.9702,
+      "ok_recall": 0.9656,
+      "confusion_matrix": [
+        [
+          293,
+          160
+        ],
+        [
+          9,
+          253
+        ]
+      ],
+      "cpu_ms": 23.2
+    }
+  ]
+}

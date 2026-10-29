@@ -1,0 +1,19 @@
+model,reference,metric,mean,lo,hi
+v1_yolo11n_baseline,loose:best_v2.pt,mAP50,0.0201,-0.0061,0.0469
+v1_yolo11n_baseline,loose:best_v2.pt,mAP50_95,0.0278,0.0088,0.0476
+v1r_yolo11n_baseline_long_s0,loose:best_v2.pt,mAP50,0.0465,0.0137,0.0794
+v1r_yolo11n_baseline_long_s0,loose:best_v2.pt,mAP50_95,0.0289,0.0066,0.0525
+v1r_yolo11n_baseline_long_s1,loose:best_v2.pt,mAP50,0.0337,0.0033,0.0652
+v1r_yolo11n_baseline_long_s1,loose:best_v2.pt,mAP50_95,0.0063,-0.0137,0.0254
+v1r_yolo11n_baseline_long_s2,loose:best_v2.pt,mAP50,0.0285,-0.0062,0.0606
+v1r_yolo11n_baseline_long_s2,loose:best_v2.pt,mAP50_95,0.0151,-0.0057,0.0343
+v3_yolo11n_severstal_ft_s0,loose:best_v2.pt,mAP50,0.0289,-0.0005,0.0585
+v3_yolo11n_severstal_ft_s0,loose:best_v2.pt,mAP50_95,0.0108,-0.0076,0.0291
+v3_yolo11n_severstal_ft_s1,loose:best_v2.pt,mAP50,0.0259,-0.0033,0.0573
+v3_yolo11n_severstal_ft_s1,loose:best_v2.pt,mAP50_95,0.0242,0.0037,0.0458
+v3_yolo11n_severstal_ft_s2,loose:best_v2.pt,mAP50,0.025,-0.0048,0.0551
+v3_yolo11n_severstal_ft_s2,loose:best_v2.pt,mAP50_95,0.0108,-0.0095,0.0304
+loose:best (1).pt,loose:best_v2.pt,mAP50,0.0743,0.0358,0.1144
+loose:best (1).pt,loose:best_v2.pt,mAP50_95,0.0321,0.0075,0.0557
+loose:best_v1.pt,loose:best_v2.pt,mAP50,0.0852,0.0526,0.1187
+loose:best_v1.pt,loose:best_v2.pt,mAP50_95,0.0417,0.0195,0.0655
