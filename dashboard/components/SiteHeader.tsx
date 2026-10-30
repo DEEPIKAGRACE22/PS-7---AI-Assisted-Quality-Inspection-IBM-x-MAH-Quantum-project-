@@ -21,7 +21,8 @@ export default function SiteHeader({ generatedAt }: { generatedAt: string }) {
   });
 
   return (
-    <header className="shell site-header">
+    <header className="site-header">
+      <div className="shell">
       <div className="nav">
         <a href="/" className="brand" aria-label="SteelSight home">
           <Mark />
@@ -36,6 +37,7 @@ export default function SiteHeader({ generatedAt }: { generatedAt: string }) {
       </div>
       <div className="nav-bar">
         <HeaderNav items={NAV} />
+      </div>
       </div>
     </header>
   );
