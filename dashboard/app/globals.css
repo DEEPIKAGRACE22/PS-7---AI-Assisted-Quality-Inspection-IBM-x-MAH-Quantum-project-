@@ -554,10 +554,20 @@ td:first-child, th:first-child { padding-left: 0.75rem; }
 }
 
 /* Keep every section inside the viewport on narrow screens */
-.hero-copy, .model-card, .figures, .inspect-run, .inspect-form, .band { min-width: 0; max-width: 100%; }
+.hero-copy, .model-card, .figures, .inspect-run, .inspect-form { min-width: 0; max-width: 100%; }
+.band { min-width: 0; }
 @media (max-width: 560px) {
   .hero { padding-block: 1.5rem 2.5rem; }
   .hero-block { margin-top: 1.5rem; }
   .model-card { padding: 1.25rem; }
   .nav-bar { overflow: hidden; }
+}
+
+/* Tablet widths: keep the wide tables inside their cards without scrolling */
+@media (max-width: 900px) {
+  th { letter-spacing: 0.08em; padding-right: 0.7rem; }
+  td { padding-right: 0.7rem; }
+  .matrix td.cell { padding-right: 0.5rem; }
+  .matrix th.num { padding-right: 0.5rem; }
+  td, th { white-space: nowrap; }
 }
