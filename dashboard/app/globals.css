@@ -571,3 +571,4 @@ td:first-child, th:first-child { padding-left: 0.75rem; }
   .matrix th.num { padding-right: 0.5rem; }
   td, th { white-space: nowrap; }
 }
+.notice { color: var(--caution); font-weight: 600; }
