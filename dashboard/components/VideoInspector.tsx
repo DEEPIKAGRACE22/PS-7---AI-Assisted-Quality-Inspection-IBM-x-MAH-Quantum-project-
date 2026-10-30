@@ -9,7 +9,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { DefectDetection, Inspection, ProgressEvent } from "../lib/types.ts";
 import {
-  API_URL,
   downloadText,
   getInspection,
   getLoadedModel,
@@ -54,7 +53,6 @@ export default function VideoInspector({ modelLabel }: { modelLabel: string }) {
   const [id, setId] = useState<string | null>(null);
   const [runConf, setRunConf] = useState(0.25);
   const [loadedModel, setLoadedModel] = useState<string | null>(null);
-  const [backend, setBackend] = useState<"checking" | "up" | "down">("checking");
   const [progress, setProgress] = useState<ProgressEvent | null>(null);
   const [live, setLive] = useState<DefectDetection[]>([]);
   const [result, setResult] = useState<Inspection | null>(null);
@@ -66,10 +64,7 @@ export default function VideoInspector({ modelLabel }: { modelLabel: string }) {
 
   // Which model file the backend loaded, shown next to the evaluation label.
   useEffect(() => {
-    getLoadedModel().then((model) => {
-      setLoadedModel(model);
-      setBackend(model ? "up" : "down");
-    });
+    getLoadedModel().then(setLoadedModel);
   }, []);
 
   // Follow a running inspection. The socket gives live alerts; polling covers
@@ -128,11 +123,7 @@ export default function VideoInspector({ modelLabel }: { modelLabel: string }) {
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       const unreachable = /Failed to fetch|Load failed|NetworkError/.test(message);
-      setError(
-        unreachable
-          ? `Can't reach the inspection backend at ${API_URL}. Start it with "python run.py" in steel-defect-backend, and make sure nothing else is using that port.`
-          : message,
-      );
+      setError(unreachable ? "Can't reach the inspection backend." : message);
       setPhase("failed");
     }
   }
@@ -178,11 +169,6 @@ export default function VideoInspector({ modelLabel }: { modelLabel: string }) {
         <div className="inspect-meta">
           <span>Model <b>{modelLabel}</b></span>
           {loadedModel && <span>Loaded by backend <b>{loadedModel}</b></span>}
-          {backend === "down" && (
-            <span className="notice">
-              No inspection backend answering at {API_URL}. Check that it is running on that port.
-            </span>
-          )}
         </div>
         <UploadDropzone file={file} onFile={setFile} />
         <div className="inspect-controls">
