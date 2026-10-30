@@ -4,9 +4,9 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata = {
-  title: "PS-7 Inspection — Model results",
+  title: "SteelSight — Steel Surface Defect Inspection",
   description:
-    "Evaluation results for every defect-detection and casting-classification model in the PS-7 quality inspection project.",
+    "SteelSight: AI-powered steel surface defect inspection. Model evaluation, casting classification and video inspection for the PS-7 project review.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -2,8 +2,6 @@
 
 import type { Classifier } from "../lib/types.ts";
 import { fmt, pct } from "../lib/format.ts";
-import { Warning } from "../app/icons.tsx";
-
 export default function CastingCard({ model, copies }: { model: Classifier; copies: number }) {
   const [[defectHit, defectMissed], [okFlagged, okPassed]] = model.confusion_matrix;
   const defects = defectHit + defectMissed;
@@ -11,7 +9,8 @@ export default function CastingCard({ model, copies }: { model: Classifier; copi
   return (
     <div className="feature">
       <div>
-        <span className="label label-fail">Casting classifier</span>
+        <span className="kind-chip">Image classification · not NEU-DET detection</span>
+        <span className="label">Casting Defect Classification – Evaluation</span>
         <h2>It lets through about one defective part in three.</h2>
         <p className="lede">
           On {model.test_images} held-out images it misses {defectMissed} of {defects} defective
@@ -27,18 +26,18 @@ export default function CastingCard({ model, copies }: { model: Classifier; copi
       </div>
 
       <div className="stack">
-        <div className="banner banner-bad" role="note">
-          <Warning className="banner-icon" />
-          <div>
-            <h3>
-              README reports {pct(model.reported_accuracy, 1)} · measured {pct(model.accuracy, 1)}
-            </h3>
-            <p>
-              The notebook read its labels and predictions from a shuffled pipeline in two passes,
-              so they did not line up. These numbers come from the dataset&rsquo;s untouched test
-              folder.
-            </p>
-          </div>
+        <div className="note" role="note">
+          <span className="label label-caution">Reported accuracy differs from measured</span>
+          <p className="note-figures">
+            README reports <b>{pct(model.reported_accuracy, 1)}</b> · independently measured{" "}
+            <b>{pct(model.accuracy, 1)}</b>
+          </p>
+          <p>
+            The README figure comes from a notebook that read labels and predictions from a shuffled
+            pipeline in two passes, so they did not line up. The measured figure is on the dataset&rsquo;s
+            untouched test folder ({model.test_images} images). The two protocols differ, so this is not a
+            like-for-like drop.
+          </p>
         </div>
 
         <div className="card">

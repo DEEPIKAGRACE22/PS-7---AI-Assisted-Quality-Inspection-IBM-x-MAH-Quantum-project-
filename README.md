@@ -211,7 +211,7 @@ python -m venv .venv && .venv/bin/pip install -r requirements.txt
 # 2. Dashboard, in another terminal
 cd dashboard
 npm install
-npm run dev            # then open http://localhost:3000/inspect
+npm run dev            # then open http://localhost:3000 and go to "Video inspection"
 ```
 
 If the backend runs somewhere other than `http://localhost:8000`, start the dashboard with `NEXT_PUBLIC_INSPECT_API_URL=http://host:port npm run dev`. `ps7_test_images_raw_upload.mp4` is a 36-second test video.

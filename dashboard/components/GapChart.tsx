@@ -17,10 +17,13 @@ export default function GapChart({
   detectors,
   metric,
   title,
+  axisNote,
 }: {
   detectors: Detector[];
   metric: "mAP50" | "mAP50_95";
   title: string;
+  /** Plain-language reading of the x-axis, shown under the chart. */
+  axisNote: string;
 }) {
   const rows = detectors
     .filter((d) => d.gap_to_reference)
@@ -54,7 +57,7 @@ export default function GapChart({
               x1={x(t)} x2={x(t)} y1={TOP - 8} y2={height - BOTTOM + 4}
             />
             <text x={x(t)} y={height - 10} textAnchor="middle">
-              {t === 0 ? "0" : `+${fmt(t, 2)}`.replace("+-", "−")}
+              {t === 0 ? "0" : `${t > 0 ? "+" : "−"}${fmt(Math.abs(t), 2)}`}
             </text>
           </g>
         ))}
@@ -77,6 +80,12 @@ export default function GapChart({
           );
         })}
       </svg>
+      <p className="caption" style={{ marginTop: "0.6rem" }}>
+        {axisNote}
+      </p>
+      <p className="caption" style={{ marginTop: "0.2rem" }}>
+        Hollow point, faint line: the interval crosses 0, so the gap could be chance.
+      </p>
     </figure>
   );
 }
