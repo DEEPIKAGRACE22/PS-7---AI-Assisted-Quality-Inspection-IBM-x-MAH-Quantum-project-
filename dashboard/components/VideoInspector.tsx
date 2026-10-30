@@ -3,12 +3,22 @@
 /**
  * Upload a video, follow the backend as it runs the model frame by frame, raise
  * an alert on the first defect, then play the annotated video next to a
- * clickable list of every defect found.
+ * clickable list of every defect found. Everything shown comes from the backend.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { DefectDetection, Inspection, ProgressEvent } from "../lib/types.ts";
-import { API_URL, getInspection, mediaUrl, uploadVideo, watchInspection } from "../lib/api.ts";
+import {
+  API_URL,
+  downloadText,
+  getInspection,
+  getLoadedModel,
+  inspectionReportCsv,
+  mediaUrl,
+  saveVideo,
+  uploadVideo,
+  watchInspection,
+} from "../lib/api.ts";
 import { className, fmt } from "../lib/format.ts";
 import UploadDropzone from "./UploadDropzone.tsx";
 import AlertBanner from "./AlertBanner.tsx";
@@ -18,7 +28,7 @@ type Phase = "idle" | "uploading" | "running" | "done" | "failed";
 
 const DECISION = {
   APPROVED: { label: "Approved", className: "label-accent" },
-  REVIEW_REQUIRED: { label: "Review required", className: "" },
+  REVIEW_REQUIRED: { label: "Review required", className: "label-caution" },
   REJECTED: { label: "Rejected", className: "label-fail" },
   UNKNOWN: { label: "Undecided", className: "" },
 } as const;
@@ -42,13 +52,21 @@ export default function VideoInspector({ modelLabel }: { modelLabel: string }) {
   const [conf, setConf] = useState(0.25);
   const [error, setError] = useState<string | null>(null);
   const [id, setId] = useState<string | null>(null);
+  const [runConf, setRunConf] = useState(0.25);
+  const [loadedModel, setLoadedModel] = useState<string | null>(null);
   const [progress, setProgress] = useState<ProgressEvent | null>(null);
   const [live, setLive] = useState<DefectDetection[]>([]);
   const [result, setResult] = useState<Inspection | null>(null);
   const [sound, setSound] = useState(false);
   const [currentTime, setCurrentTime] = useState<number | null>(null);
   const [duration, setDuration] = useState<number | null>(null);
+  const [saving, setSaving] = useState<"video" | "report" | null>(null);
   const video = useRef<HTMLVideoElement>(null);
+
+  // Which model file the backend loaded, shown next to the evaluation label.
+  useEffect(() => {
+    getLoadedModel().then(setLoadedModel);
+  }, []);
 
   // Follow a running inspection. The socket gives live alerts; polling covers
   // events sent before it connected and a socket that never connects.
@@ -83,6 +101,7 @@ export default function VideoInspector({ modelLabel }: { modelLabel: string }) {
 
   // The saved detections are complete; the live list can miss the first frames.
   const events = useMemo(() => groupDefectEvents(result ? result.defects : live), [result, live]);
+  const detectionCount = result ? result.defects.length : live.length;
 
   const heard = useRef(0);
   useEffect(() => {
@@ -99,6 +118,7 @@ export default function VideoInspector({ modelLabel }: { modelLabel: string }) {
       setLive([]);
       setProgress(null);
       setResult(null);
+      setRunConf(conf);
       setId(inspection.id);
       setPhase("running");
     } catch (e) {
@@ -125,10 +145,31 @@ export default function VideoInspector({ modelLabel }: { modelLabel: string }) {
     video.current.pause();
   }
 
+  async function saveAnnotatedVideo() {
+    if (!result?.annotated_url) return;
+    setSaving("video");
+    try {
+      const base = (file?.name ?? "inspection").replace(/\.[^.]+$/, "");
+      await saveVideo(mediaUrl(result.annotated_url), `annotated_${base}.mp4`);
+    } finally {
+      setSaving(null);
+    }
+  }
+
+  function saveReport() {
+    if (!result) return;
+    const base = (file?.name ?? "inspection").replace(/\.[^.]+$/, "");
+    downloadText(inspectionReportCsv(result, { model: loadedModel ?? "unknown", threshold: runConf }), `report_${base}.csv`);
+  }
+
   // ------------------------------------------------------------ upload form
   if (phase === "idle" || phase === "uploading" || (phase === "failed" && !id)) {
     return (
       <div className="card card-lift inspect-form">
+        <div className="inspect-meta">
+          <span>Model <b>{modelLabel}</b></span>
+          {loadedModel && <span>Loaded by backend <b>{loadedModel}</b></span>}
+        </div>
         <UploadDropzone file={file} onFile={setFile} />
         <div className="inspect-controls">
           <label className="slider">
@@ -142,8 +183,7 @@ export default function VideoInspector({ modelLabel }: { modelLabel: string }) {
           </button>
         </div>
         <p className="caption">
-          Runs {modelLabel} on every second frame. Boxes below the threshold are dropped; 0.25 is the threshold the
-          evaluation used.
+          Runs the model on every second frame. Boxes below the threshold are dropped. The evaluation used 0.25.
         </p>
         {error && (
           <div className="banner banner-bad">
@@ -159,6 +199,8 @@ export default function VideoInspector({ modelLabel }: { modelLabel: string }) {
 
   // ------------------------------------------------------- run and result
   const total = result?.total_frames ?? progress?.total_frames ?? 0;
+  const framesDone = result?.frames_processed ?? progress?.frame_index ?? 0;
+  const truncated = result !== null && result.frames_processed < result.total_frames;
   const perClass = Object.entries(
     events.reduce<Record<string, number>>((acc, e) => ({ ...acc, [e.class_name]: (acc[e.class_name] ?? 0) + 1 }), {}),
   ).sort((a, b) => b[1] - a[1]);
@@ -168,6 +210,35 @@ export default function VideoInspector({ modelLabel }: { modelLabel: string }) {
   return (
     <div className="stack inspect-run">
       <AlertBanner events={events} running={phase === "running"} sound={sound} onSound={setSound} />
+
+      <dl className="metric-strip" aria-label="Run summary">
+        <div>
+          <dt>Model</dt>
+          <dd>{loadedModel ?? modelLabel}</dd>
+        </div>
+        <div>
+          <dt>Confidence threshold</dt>
+          <dd className="n">{fmt(runConf, 2)}</dd>
+        </div>
+        <div>
+          <dt>Frames processed</dt>
+          <dd className="n">
+            {framesDone} / {total || "–"}
+          </dd>
+        </div>
+        <div>
+          <dt>Defects detected</dt>
+          <dd>
+            {events.length} <small className="n-faint">events · {detectionCount} boxes</small>
+          </dd>
+        </div>
+      </dl>
+      {truncated && (
+        <p className="truncated">
+          Only {result!.frames_processed} of {result!.total_frames} frames were processed (backend frame cap). Later
+          defects are not in this report.
+        </p>
+      )}
 
       <div className="detail-grid">
         <div className="stack">
@@ -203,6 +274,12 @@ export default function VideoInspector({ modelLabel }: { modelLabel: string }) {
             </div>
           )}
 
+          {phase === "done" && (
+            <p className="caption" style={{ marginTop: 0 }}>
+              Annotated video, with the timestamp burned into each frame. Click a defect to jump to it; the time shown is the original video&rsquo;s.
+            </p>
+          )}
+
           <DefectTimeline
             events={events}
             totalFrames={total}
@@ -222,16 +299,6 @@ export default function VideoInspector({ modelLabel }: { modelLabel: string }) {
                 {reasons.length > 1 && ` (+${reasons.length - 1} more)`}
               </p>
             )}
-            <dl className="kv kv-2">
-              <div>
-                <dt>Defect events</dt>
-                <dd>{events.length}</dd>
-              </div>
-              <div>
-                <dt>Frames</dt>
-                <dd>{total || "–"}</dd>
-              </div>
-            </dl>
           </div>
 
           {perClass.length > 0 && (
@@ -249,18 +316,25 @@ export default function VideoInspector({ modelLabel }: { modelLabel: string }) {
             </div>
           )}
 
-          <div className="inspect-actions">
-            {phase === "done" && result?.annotated_url && (
-              <a className="btn" href={mediaUrl(result.annotated_url)} target="_blank" rel="noreferrer">
-                Open annotated video
-              </a>
-            )}
-            {phase !== "running" && (
-              <button type="button" className="btn btn-ghost" onClick={reset}>
-                Inspect another video
-              </button>
-            )}
-          </div>
+          {phase === "done" && (
+            <div className="aside-card">
+              <h3>Export</h3>
+              <div className="inspect-actions">
+                <button type="button" className="btn" disabled={saving !== null} onClick={saveAnnotatedVideo}>
+                  {saving === "video" ? "Saving…" : "Download annotated video"}
+                </button>
+                <button type="button" className="btn btn-ghost" onClick={saveReport}>
+                  Download report (CSV)
+                </button>
+              </div>
+            </div>
+          )}
+
+          {phase !== "running" && (
+            <button type="button" className="btn btn-ghost" onClick={reset}>
+              Inspect another video
+            </button>
+          )}
         </aside>
       </div>
     </div>

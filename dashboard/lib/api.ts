@@ -54,3 +54,57 @@ export function watchInspection(id: string, on: Handlers): () => void {
   socket.onerror = () => on.error(`Lost connection to ${API_URL}`);
   return () => socket.close();
 }
+
+/** The model file the backend actually loaded, from GET /health. */
+export async function getLoadedModel(): Promise<string | null> {
+  try {
+    const health = await json<{ yolo_model?: string }>(await fetch(`${API_URL}/health`, { cache: "no-store" }));
+    return health.yolo_model ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Save the annotated video as a file. Cross-origin links ignore the download attribute, so fetch the bytes first. */
+export async function saveVideo(url: string, filename: string): Promise<void> {
+  const blob = await (await fetch(url)).blob();
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(objectUrl);
+}
+
+/** One row per saved detection, with its time in the original video. */
+export function inspectionReportCsv(inspection: Inspection, meta: { model: string; threshold: number }): string {
+  const header = ["file", "model", "confidence_threshold", "frames_processed", "total_frames", "decision", "class", "confidence", "frame", "timestamp_s", "x1", "y1", "x2", "y2"];
+  const rows = [...inspection.defects]
+    .sort((a, b) => a.frame_number - b.frame_number)
+    .map((d) => [
+      inspection.file_name,
+      meta.model,
+      meta.threshold,
+      inspection.frames_processed,
+      inspection.total_frames,
+      inspection.quality_decision,
+      d.class_name,
+      d.confidence.toFixed(4),
+      d.frame_number,
+      d.timestamp_s.toFixed(3),
+      d.bbox.x1,
+      d.bbox.y1,
+      d.bbox.x2,
+      d.bbox.y2,
+    ]);
+  return [header, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n") + "\n";
+}
+
+export function downloadText(content: string, filename: string): void {
+  const url = URL.createObjectURL(new Blob([content], { type: "text/csv" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
