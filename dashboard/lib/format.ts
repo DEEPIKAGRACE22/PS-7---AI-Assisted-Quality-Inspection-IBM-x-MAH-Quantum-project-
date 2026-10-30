@@ -16,3 +16,9 @@ export function signed(value: number, digits = 3): string {
 export function className(name: string): string {
   return name.replace(/_/g, " ");
 }
+
+/** Video time as m:ss.s, matching the timestamp burned into the annotated video. */
+export function clock(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  return `${m}:${(seconds - m * 60).toFixed(1).padStart(4, "0")}`;
+}

@@ -66,3 +66,48 @@ export type Evaluation = {
   classifiers: Classifier[];
   caveats: string[];
 };
+
+/* Video inspection: mirrors steel-defect-backend/app/models/schemas.py. */
+
+export type BoundingBox = { x1: number; y1: number; x2: number; y2: number; width: number; height: number; area: number };
+
+export type DefectDetection = {
+  class_id: number;
+  class_name: string;
+  confidence: number;
+  bbox: BoundingBox;
+  frame_number: number;
+  /** Seconds into the source video. */
+  timestamp_s: number;
+};
+
+export type QualityDecision = "APPROVED" | "REVIEW_REQUIRED" | "REJECTED" | "UNKNOWN";
+
+export type Inspection = {
+  id: string;
+  file_name: string;
+  status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
+  quality_decision: QualityDecision;
+  decision_reason: string | null;
+  total_defects: number;
+  max_confidence: number;
+  frames_processed: number;
+  total_frames: number;
+  error_message: string | null;
+  defects: DefectDetection[];
+  annotated_url: string | null;
+};
+
+export type ProgressEvent = {
+  frame_index: number;
+  total_frames: number;
+  progress_percent: number;
+  fps: number;
+  current_defects_found: number;
+};
+
+export type DefectAlertEvent = {
+  frame_index: number;
+  timestamp_s: number;
+  detections: DefectDetection[];
+};

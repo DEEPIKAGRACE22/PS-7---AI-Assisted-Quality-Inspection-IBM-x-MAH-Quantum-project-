@@ -39,6 +39,7 @@ class DefectDetection(BaseModel):
     confidence: float = Field(..., ge=0.0, le=1.0, description="Detection confidence score")
     bbox: BoundingBox
     frame_number: Optional[int] = Field(0, description="Frame index for video inspections")
+    timestamp_s: Optional[float] = Field(0.0, description="Time of the frame in the source video, in seconds")
 
 
 class QualityDecisionResult(BaseModel):

@@ -155,8 +155,8 @@ class InspectionService:
                     cursor.execute("""
                         INSERT INTO defects (
                             id, inspection_id, class_id, class_name, confidence,
-                            x1, y1, x2, y2, width, height, area, frame_number, created_at
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                            x1, y1, x2, y2, width, height, area, frame_number, timestamp_s, created_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                     """, (
                         defect_id,
                         inspection_id,
@@ -171,6 +171,7 @@ class InspectionService:
                         det.bbox.height,
                         det.bbox.area,
                         0,
+                        0.0,
                         completed_now,
                     ))
 
@@ -431,6 +432,23 @@ class InspectionService:
                 loop,
             )
 
+            # One alert per frame with a defect, carrying where and when in the video
+            new_detections: List[DefectDetection] = prog_data["new_detections"]
+            if new_detections:
+                asyncio.run_coroutine_threadsafe(
+                    ws_manager.broadcast_inspection_event(
+                        inspection_id=inspection_id,
+                        event_type="defect_alert",
+                        data={
+                            "inspection_id": inspection_id,
+                            "frame_index": curr_frame,
+                            "timestamp_s": prog_data["timestamp_s"],
+                            "detections": [d.model_dump(exclude={"id"}) for d in new_detections],
+                        },
+                    ),
+                    loop,
+                )
+
         try:
             # Run heavy video processing in executor thread to prevent blocking FastAPI event loop
             result = await loop.run_in_executor(
@@ -461,8 +479,8 @@ class InspectionService:
                     cursor.execute("""
                         INSERT INTO defects (
                             id, inspection_id, class_id, class_name, confidence,
-                            x1, y1, x2, y2, width, height, area, frame_number, created_at
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                            x1, y1, x2, y2, width, height, area, frame_number, timestamp_s, created_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                     """, (
                         defect_id,
                         inspection_id,
@@ -477,6 +495,7 @@ class InspectionService:
                         det.bbox.height,
                         det.bbox.area,
                         det.frame_number,
+                        det.timestamp_s,
                         completed_now,
                     ))
 
@@ -551,7 +570,7 @@ class InspectionService:
                 raise HTTPException(status_code=404, detail=f"Inspection '{inspection_id}' not found.")
 
             cursor.execute("""
-                SELECT id, class_id, class_name, confidence, x1, y1, x2, y2, width, height, area, frame_number
+                SELECT id, class_id, class_name, confidence, x1, y1, x2, y2, width, height, area, frame_number, timestamp_s
                 FROM defects
                 WHERE inspection_id = ?
                 ORDER BY confidence DESC;
@@ -574,6 +593,7 @@ class InspectionService:
                     area=d["area"],
                 ),
                 frame_number=d["frame_number"],
+                timestamp_s=d["timestamp_s"],
             )
             for d in defect_rows
         ]

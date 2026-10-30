@@ -19,6 +19,7 @@ class Settings(BaseSettings):
 
     # Base Paths
     BASE_DIR: Path = Path(__file__).resolve().parent.parent
+    REPO_ROOT: Path = BASE_DIR.parent
     WEIGHTS_DIR: Path = BASE_DIR / "weights"
     STORAGE_DIR: Path = BASE_DIR / "storage"
     UPLOADS_DIR: Path = STORAGE_DIR / "uploads"
@@ -27,8 +28,10 @@ class Settings(BaseSettings):
     SAMPLES_DIR: Path = BASE_DIR / "samples"
 
     # Model Settings
-    DEFAULT_WEIGHTS_PATH: Path = WEIGHTS_DIR / "best_v2.pt"
-    FALLBACK_WEIGHTS_PATH: Path = WEIGHTS_DIR / "best_finetuned.pt"
+    # The model docs/MODEL_EVALUATION_REPORT.md recommends. The fallback is the
+    # registered baseline; models/best (1).pt is marked do-not-use there.
+    DEFAULT_WEIGHTS_PATH: Path = REPO_ROOT / "models" / "best_v2.pt"
+    FALLBACK_WEIGHTS_PATH: Path = REPO_ROOT / "models" / "v1_yolo11n_baseline" / "weights" / "best.pt"
     
     # Six NEU-DET steel defect classes
     NEU_CLASSES: Dict[int, str] = {
@@ -59,6 +62,7 @@ class Settings(BaseSettings):
     # Video processing
     VIDEO_SAMPLE_STRIDE: int = 2  # Process every Nth frame to optimize throughput while maintaining defect coverage
     VIDEO_MAX_FRAMES: int = 5000  # Safety cap for continuous inspection video
+    VIDEO_MIN_OUTPUT_WIDTH: int = 640  # Narrower videos are upscaled in the annotated output so labels stay legible
 
     # Database
     DATABASE_PATH: Path = STORAGE_DIR / "steel_inspections.db"
