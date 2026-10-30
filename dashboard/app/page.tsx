@@ -3,6 +3,7 @@
 import { getEvaluation, reference } from "../lib/data.ts";
 import { className, fmt, pct } from "../lib/format.ts";
 import SiteHeader from "../components/SiteHeader.tsx";
+import SiteFooter from "../components/SiteFooter.tsx";
 import Leaderboard from "../components/Leaderboard.tsx";
 import GapChart from "../components/GapChart.tsx";
 import ClassMatrix from "../components/ClassMatrix.tsx";
@@ -39,51 +40,81 @@ export default async function Overview() {
 
       <main>
         {/* ------------------------------------------------------------ head */}
-        <section className="shell hero">
+        <section className="shell hero" id="overview">
           <div className="hero-grid">
-            <div>
-              <span className="label label-accent">Project review · NEU-DET steel defects</span>
-              <h1>
-                {ref.label} leads.
-                <em>Not by enough to call it.</em>
-              </h1>
-              <p className="lede">
-                {detectors.length} detectors were evaluated on the same {splits.test.images} test images.
-                The hard-example model comes out on top, but against {closeCalls} of the others its
-                mAP50 lead <span className="mark">could be chance</span>. The bigger problem is{" "}
-                {className(weakClass)}, which every model mostly misses.
-              </p>
+            <div className="hero-copy">
+              <span className="label label-accent">Computer Vision · Deep Learning · Industrial Quality Inspection</span>
+              <h1>SteelSight</h1>
+              <p className="hero-subtitle">AI-Powered Steel Surface Defect Inspection System</p>
+
+              <div className="hero-block">
+                <h3>The Challenge</h3>
+                <p>
+                  Steel manufacturing processes require continuous inspection to identify surface defects such as
+                  crazing, inclusions, patches, pitted surfaces, rolled-in scale and scratches.
+                </p>
+                <p>
+                  Manual inspection can be time-consuming and inconsistent, particularly when steel sheets move
+                  continuously along conveyor belts. Identifying defects accurately and at the right time is essential
+                  for maintaining product quality and reducing defective output.
+                </p>
+              </div>
+
+              <div className="hero-block">
+                <h3>Our Approach</h3>
+                <p>
+                  SteelSight is an AI-powered steel surface inspection system that uses computer vision and deep
+                  learning to automatically detect and classify surface defects from conveyor-belt video recordings.
+                </p>
+                <p>
+                  The system processes video frames, identifies defects using an object detection model, generates
+                  annotated videos containing bounding boxes and confidence scores, records defect timestamps and
+                  raises alerts whenever defects are detected.
+                </p>
+              </div>
             </div>
 
-            <div className="split-card" aria-label="Selected model and weakest class">
-              <div className="split-half split-good">
-                <span className="label label-accent">Selected model</span>
-                <h4>{ref.label}</h4>
-                <p>{ref.trained_on}.</p>
-                <span className="split-number">
-                  {fmt(ref.metrics.test.mAP50_95)}
-                  <small>test mAP50-95</small>
-                </span>
-              </div>
-              <div className="split-half split-bad">
-                <span className="label label-caution">Weakest class</span>
-                <h4>{className(weakClass)}</h4>
-                <p>The most real {className(weakClass)} defects any model finds at conf 0.25.</p>
-                <span className="split-number">
-                  {pct(bestWeakRecall)}
-                  <small>recall, best of any model</small>
-                </span>
-              </div>
-            </div>
+            <aside className="model-card" aria-label="Selected detection model">
+              <span className="label">Selected Detection Model</span>
+              <h2 className="model-file">{ref.label}</h2>
+              <p className="model-desc">
+                YOLO-based steel surface defect detection model selected following comparative evaluation of{" "}
+                {detectors.length} detector configurations.
+              </p>
+
+              <dl className="model-metrics">
+                <div>
+                  <dt>Test mAP50</dt>
+                  <dd>{fmt(ref.metrics.test.mAP50)}</dd>
+                </div>
+                <div>
+                  <dt>Test mAP50-95</dt>
+                  <dd>{fmt(ref.metrics.test.mAP50_95)}</dd>
+                </div>
+                <div>
+                  <dt>Recall at conf 0.25</dt>
+                  <dd>{fmt(ref.metrics.test.recall_at_conf025)}</dd>
+                </div>
+              </dl>
+              <p className="model-note">
+                Model evaluation metrics on the held-out test split. These are not live inspection statistics.
+              </p>
+
+              <p className="model-selection">
+                Chosen as the recommended candidate after comparing {detectors.length} detector configurations on the
+                test split. Its lead is small, and the validation split ranks models differently, so the Model
+                Evaluation section shows the full comparison.
+              </p>
+            </aside>
           </div>
         </section>
 
         <section className="shell">
           <ul className="figures">
             <li><b>{detectors.length}</b><span>detectors evaluated</span></li>
-            <li><b>{splits.test.images}</b><span>test images · {splits.test.boxes} boxes</span></li>
-            <li><b>{fmt(ref.metrics.test.mAP50)}</b><span>{ref.label} test mAP50</span></li>
-            <li><b>{ref.metrics.test.missed_at_conf025}</b><span>defects missed by {ref.label}</span></li>
+            <li><b>{splits.test.images}</b><span>test images</span></li>
+            <li><b>{splits.test.boxes}</b><span>labelled bounding boxes</span></li>
+            <li><b>{fmt(ref.metrics.test.mAP50)}</b><span>selected model · test mAP50</span></li>
           </ul>
         </section>
 
@@ -210,13 +241,7 @@ export default async function Overview() {
         </section>
       </main>
 
-      <footer className="shell foot">
-        <span>PS-7 · AI-assisted quality inspection</span>
-        <span>
-          Regenerate with <code>python scripts/evaluate_all.py</code> then{" "}
-          <code>python scripts/export_dashboard_json.py</code>
-        </span>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

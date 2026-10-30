@@ -5,6 +5,7 @@ import { getEvaluation } from "../../../lib/data.ts";
 import { fmt, pct, signed } from "../../../lib/format.ts";
 import type { Split } from "../../../lib/types.ts";
 import SiteHeader from "../../../components/SiteHeader.tsx";
+import SiteFooter from "../../../components/SiteFooter.tsx";
 import ClassBars from "../../../components/ClassBars.tsx";
 import { ArrowLeft } from "../../icons.tsx";
 
@@ -122,6 +123,8 @@ export default async function ModelPage({ params }: { params: Promise<{ id: stri
           </aside>
         </div>
       </main>
+
+      <SiteFooter />
     </>
   );
 }
