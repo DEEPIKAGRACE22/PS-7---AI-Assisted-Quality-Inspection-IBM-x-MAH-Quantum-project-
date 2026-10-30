@@ -44,7 +44,7 @@ export default async function Overview() {
           <div className="hero-grid">
             <div className="hero-copy">
               <span className="label label-accent">Computer Vision · Deep Learning · Industrial Quality Inspection</span>
-              <h1>SteelSight</h1>
+              <h1 className="hero-name">SteelSight</h1>
               <p className="hero-subtitle">AI-Powered Steel Surface Defect Inspection System</p>
 
               <div className="hero-block">

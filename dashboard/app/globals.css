@@ -198,7 +198,7 @@ code, .mono { font-family: var(--mono); font-size: 0.8125rem; }
 .hero { padding-block: clamp(2rem, 6vw, 5rem) clamp(2.5rem, 6vw, 4.5rem); }
 .hero-grid {
   display: grid; grid-template-columns: 1.25fr 0.85fr;
-  gap: clamp(2rem, 5vw, 4.5rem); align-items: end;
+  gap: clamp(2rem, 5vw, 4.5rem); align-items: start;
 }
 @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; align-items: start; } }
 
@@ -539,4 +539,15 @@ td:first-child, th:first-child { padding-left: 0.75rem; }
   margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line);
   display: flex; flex-wrap: wrap; gap: 0.6rem 1.5rem; justify-content: space-between;
   font-size: 0.8125rem; color: var(--ink-faint);
+}
+
+/* Project name: the hero's dominant element, with a lime rule as its accent */
+.hero-copy h1.hero-name {
+  font-size: clamp(3.4rem, 8.5vw, 6.5rem); font-weight: 700; letter-spacing: -0.055em;
+  line-height: 0.95; margin-block: 1.1rem 0.8rem;
+}
+.hero-name { position: relative; display: inline-block; }
+.hero-name::after {
+  content: ""; position: absolute; left: 0.04em; bottom: -0.02em; width: 2.2rem; height: 0.09em;
+  min-height: 6px; border-radius: 999px; background: var(--lime);
 }
