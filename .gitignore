@@ -19,3 +19,6 @@ venv/
 
 # OS
 .DS_Store
+
+# Backend runtime data (uploads, annotated output, SQLite)
+steel-defect-backend/storage/

@@ -20,6 +20,8 @@ export default function SiteHeader({ generatedAt }: { generatedAt: string }) {
           PS-7 Inspection
         </a>
         <div className="nav-right">
+          <a href="/" className="nav-link">Results</a>
+          <a href="/inspect" className="nav-link">Inspect a video</a>
           <span className="nav-date hide-sm">Evaluated {date}</span>
           <a href={REPORT_URL} className="btn btn-ghost">
             Full report <ArrowRight className="tick" />

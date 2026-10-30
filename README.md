@@ -197,3 +197,21 @@ python scripts/export_dashboard_json.py
 - [x] Transfer learning from Severstal (`notebooks/v2_severstal_transfer_colab.ipynb`): small overall gain (mAP50-95 0.422 vs 0.407 control, within noise), crazing recall not improved. See [`docs/RESULTS_SEVERSTAL_TRANSFER.md`](docs/RESULTS_SEVERSTAL_TRANSFER.md)
 - [ ] Improve `crazing` and `rolled-in_scale`: label audit, CLAHE contrast enhancement, class oversampling
 - [ ] Production-line demonstration (real-time inference app)
+
+## Video inspection
+
+Upload a conveyor video and get it back with every defect boxed, its confidence, and the video timestamp burned in. The dashboard raises an alert as soon as a defect is found. It uses the recommended model, `models/best_v2.pt`.
+
+```bash
+# 1. Backend (FastAPI + YOLO), port 8000
+cd steel-defect-backend
+python -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python run.py
+
+# 2. Dashboard, in another terminal
+cd dashboard
+npm install
+npm run dev            # then open http://localhost:3000/inspect
+```
+
+If the backend runs somewhere other than `http://localhost:8000`, start the dashboard with `NEXT_PUBLIC_INSPECT_API_URL=http://host:port npm run dev`. `ps7_test_images_raw_upload.mp4` is a 36-second test video.

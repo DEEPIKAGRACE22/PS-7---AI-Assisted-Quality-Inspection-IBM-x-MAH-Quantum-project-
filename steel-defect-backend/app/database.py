@@ -108,10 +108,16 @@ def init_database() -> None:
                 height REAL NOT NULL,
                 area REAL NOT NULL,
                 frame_number INTEGER DEFAULT 0,
+                timestamp_s REAL DEFAULT 0,
                 created_at TIMESTAMP NOT NULL,
                 FOREIGN KEY (inspection_id) REFERENCES inspections(id) ON DELETE CASCADE
             );
         """)
+
+        # Databases created before timestamp_s existed
+        cursor.execute("PRAGMA table_info(defects);")
+        if "timestamp_s" not in {row[1] for row in cursor.fetchall()}:
+            cursor.execute("ALTER TABLE defects ADD COLUMN timestamp_s REAL DEFAULT 0;")
 
         # 4. Configurable Quality Rules table
         cursor.execute("""

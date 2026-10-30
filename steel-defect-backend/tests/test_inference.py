@@ -5,6 +5,7 @@ Validates model loading, NEU-DET class preservation, inference latency, and boun
 import os
 import sys
 from pathlib import Path
+import cv2
 import numpy as np
 
 # Ensure project root is in sys.path
@@ -73,6 +74,38 @@ def test_inference_on_sample_images():
             assert d.bbox.area >= 0
 
 
+def test_video_timestamps_and_browser_output(tmp_dir: Path = settings.STORAGE_DIR / "test_video"):
+    service = get_yolo_service()
+    events = []
+    out_path = tmp_dir / "annotated.mp4"
+    result = service.process_video(
+        video_path=settings.SAMPLES_DIR / "sample_inspection_short.mp4",
+        output_video_path=out_path,
+        progress_callback=events.append,
+        stride=2,
+    )
+
+    # Every detection knows when it happened in the source video
+    fps = result["fps"]
+    stamps = [d.timestamp_s for d in result["detections"]]
+    assert stamps == sorted(stamps)
+    for d in result["detections"]:
+        assert abs(d.timestamp_s - (d.frame_number - 1) / fps) < 1e-3
+
+    # The callback reports each frame with detections as it happens
+    alerted = [d for e in events for d in e["new_detections"]]
+    assert len(alerted) == len(result["detections"])
+
+    # Output is H.264 so a browser <video> can play it, and keeps every frame
+    cap = cv2.VideoCapture(str(out_path))
+    fourcc = int(cap.get(cv2.CAP_PROP_FOURCC)).to_bytes(4, "little").decode()
+    frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    cap.release()
+    assert fourcc in ("avc1", "h264"), fourcc
+    assert frames == result["processed_frames"]
+    assert not out_path.with_name("annotated_raw.mp4").exists()
+
+
 if __name__ == "__main__":
     print("Running YOLO Inference tests...")
     test_yolo_service_initialization()
@@ -81,4 +114,6 @@ if __name__ == "__main__":
     print("-> Device Info: PASSED")
     test_inference_on_sample_images()
     print("-> Inference on Sample Images: PASSED")
+    test_video_timestamps_and_browser_output()
+    print("-> Video Timestamps & Browser Output: PASSED")
     print("ALL INFERENCE TESTS PASSED!")
