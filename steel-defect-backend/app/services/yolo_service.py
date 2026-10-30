@@ -304,14 +304,20 @@ class YOLOInferenceService:
         if not ffmpeg:
             return False
 
-        subprocess.run(
-            [
-                ffmpeg, "-y", "-loglevel", "error", "-i", str(src),
-                "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
-                "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-an", str(dst),
-            ],
-            check=True,
-        )
+        try:
+            subprocess.run(
+                [
+                    ffmpeg, "-y", "-loglevel", "error", "-i", str(src),
+                    "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
+                    "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-an", str(dst),
+                ],
+                check=True,
+                timeout=600,
+            )
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+            logger.warning(f"ffmpeg transcode failed: {e}")
+            dst.unlink(missing_ok=True)
+            return False
         return True
 
     def process_video(
@@ -383,7 +389,7 @@ class YOLOInferenceService:
                     all_detections.extend(new_detections)
                     processed_count += 1
 
-                display = frame if out_scale == 1.0 else cv2.resize(frame, out_size, interpolation=cv2.INTER_CUBIC)
+                display = frame if out_size == (width, height) else cv2.resize(frame, out_size, interpolation=cv2.INTER_CUBIC)
                 annotated_frame = self._annotate_image(
                     display, held, held_ms, frame_idx, total_frames, timestamp_s, box_scale=out_size[0] / width
                 )
@@ -413,7 +419,7 @@ class YOLOInferenceService:
         if self._transcode_for_browser(raw_path, output_video_path):
             raw_path.unlink(missing_ok=True)
         else:
-            logger.warning("ffmpeg not found; annotated video stays MPEG-4 Part 2 and may not play in browsers.")
+            logger.warning("ffmpeg unavailable or failed; annotated video stays MPEG-4 Part 2 and may not play in browsers.")
             raw_path.replace(output_video_path)
 
         total_elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
