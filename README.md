@@ -29,7 +29,6 @@ An object-detection model that locates and classifies surface defects on hot-rol
 │   └── predict.py            # run a version on images
 ├── dashboard/                # results dashboard (Next.js), see "Dashboard" below
 ├── steel-defect-backend/     # FastAPI + YOLO inspection backend, see "Video inspection"
-├── steel-dashboard/          # alternative Vite dashboard (incomplete, does not build)
 ├── models/                   # model registry (see models/README.md)
 │   └── v1_yolo11n_baseline/  # weights, config, metrics, model card
 ├── notebooks/                # Colab runners and experiments (casting/ = casting classifier)
