@@ -1,6 +1,7 @@
 # Datasets (regenerate with scripts/prepare_*.py)
 data/*
 !data/.gitkeep
+!data/raw/
 
 # Ultralytics training/eval outputs
 runs/
