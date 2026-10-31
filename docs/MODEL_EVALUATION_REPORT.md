@@ -12,9 +12,9 @@ Date: 2026-10-29. Every checkpoint in `models/`, plus the casting classifier in 
 | `v1r_yolo11n_baseline_long_s0/s1/s2` | NEU-DET detection | full train split, AdamW, up to 100 epochs | yes |
 | `v2_yolo11n_severstal_pretrain` | Severstal detection (4 classes) | Severstal tiles | yes (intermediate only) |
 | `v3_yolo11n_severstal_ft_s0/s1/s2` | NEU-DET detection | v2, then fine-tuned on NEU-DET | yes |
-| `models/best_v1.pt` | NEU-DET detection | 50% of train split (`notebooks/ps7_train_and_evaluate.ipynb`) | no |
-| `models/best_v2.pt` | NEU-DET detection | best_v1's 50%, plus the hardest 50% of the remaining pool | no |
-| `models/best (1).pt` | NEU-DET detection | fine-tuned 25 epochs from an unknown `best.pt` | no, origin baselinemodel |
+| `models/best_v1.pt` | NEU-DET detection | 50% of train split (`notebooks/ps7_train_and_evaluate.ipynb`) | yes |
+| `models/best_v2.pt` | NEU-DET detection | best_v1's 50%, plus the hardest 50% of the remaining pool | yes |
+| `models/best (1).pt` | NEU-DET detection | fine-tuned 25 epochs from an unknown `best.pt` |  origin baselinemodel |
 | `casting_defect_classifier(_final).keras` | casting defect classification (`defective` / `ok`) | Kaggle casting `train/` folder | yes |
 
 `v2_yolo11n_severstal_pretrain` predicts Severstal classes, not NEU-DET classes, so it cannot be scored on NEU-DET. It is used only as the starting point for v3.
