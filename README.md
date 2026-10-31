@@ -28,9 +28,12 @@ An object-detection model that locates and classifies surface defects on hot-rol
 │   ├── export_dashboard_json.py  # reports/eval_all/ -> dashboard/data/evaluation.json
 │   └── predict.py            # run a version on images
 ├── dashboard/                # results dashboard (Next.js), see "Dashboard" below
+├── steel-defect-backend/     # FastAPI + YOLO inspection backend, see "Video inspection"
+├── steel-dashboard/          # alternative Vite dashboard (incomplete, does not build)
 ├── models/                   # model registry (see models/README.md)
 │   └── v1_yolo11n_baseline/  # weights, config, metrics, model card
-├── notebooks/                # Colab runners (v1 original, v2 Severstal transfer)
+├── notebooks/                # Colab runners and experiments (casting/ = casting classifier)
+├── assets/                   # test video, annotated video demo, casting classifier package
 ├── docs/IMPROVEMENT_PLAN.md
 ├── data/                     # generated datasets (git-ignored)
 └── runs/                     # Ultralytics outputs (git-ignored)
@@ -214,4 +217,4 @@ npm install
 npm run dev            # then open http://localhost:3000 and go to "Video inspection"
 ```
 
-If the backend runs somewhere other than `http://localhost:8000`, start the dashboard with `NEXT_PUBLIC_INSPECT_API_URL=http://host:port npm run dev`. `ps7_test_images_raw_upload.mp4` is a 36-second test video.
+If the backend runs somewhere other than `http://localhost:8000`, start the dashboard with `NEXT_PUBLIC_INSPECT_API_URL=http://host:port npm run dev`. `assets/videos/ps7_test_images_raw_upload.mp4` is a 36-second test video.
