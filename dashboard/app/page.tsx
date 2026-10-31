@@ -7,7 +7,6 @@ import SiteFooter from "../components/SiteFooter.tsx";
 import Leaderboard from "../components/Leaderboard.tsx";
 import GapChart from "../components/GapChart.tsx";
 import ClassMatrix from "../components/ClassMatrix.tsx";
-import CastingCard from "../components/CastingCard.tsx";
 import VideoInspector from "../components/VideoInspector.tsx";
 
 export const dynamic = "force-dynamic";
@@ -31,8 +30,6 @@ export default async function Overview() {
   const closeCalls = compared.filter((d) => d.gap_to_reference!.mAP50.lo <= 0).length;
   const clearlyBehind = compared.length - closeCalls;
   const weakBoxes = ref.per_class.test.find((r) => r.class === weakClass)!.gt_boxes;
-
-  const casting = evaluation.classifiers[0];
 
   return (
     <>
@@ -205,15 +202,6 @@ export default async function Overview() {
             </ul>
           </div>
         </section>
-
-        {/* ------------------------------------------------------- casting */}
-        {casting && (
-          <section className="band band-sunk casting-band">
-            <div className="shell">
-              <CastingCard model={casting} copies={evaluation.classifiers.length} />
-            </div>
-          </section>
-        )}
 
         {/* ------------------------------------------------------- video */}
         <section className="band shell video-section" id="video-inspection">
