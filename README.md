@@ -6,10 +6,35 @@ Detects and classifies surface defects on hot-rolled steel strips. The project h
 - **Backend:** a FastAPI service (`steel-defect-backend/`) that runs the detector on images and videos and decides whether each item is approved, needs review, or is rejected.
 - **Dashboard:** a Next.js page (`dashboard/`) that shows the model evaluation and lets you upload a video for inspection.
 
+## Project team
+
+**Project No:** 7
+
+**Topic:** AI-Assisted Quality Inspection
+
+**Guides:**
+
+- Dr. Asha
+- Dr. Shruthi
+- Dr. Anoop
+
+**Team members:**
+
+| # | Name | Register No. | Class |
+|---|------|--------------|-------|
+| 1 | John Jomi | 2460381 | 5 BTCS C |
+| 2 | Deepika Grace T T | 2460357 | 5 BTCS B |
+| 3 | Tania Robby | 2461032 | 5 BTCS C |
+| 4 | Sartaj S | 2461026 | 5 BT IT |
+| 5 | Anisha Divi R | 2460329 | 5 BTCS A |
+| 6 | Arnima Guha | 2460337 | 5 BTCS C |
+
 ## Contents
 
+- [Project team](#project-team)
 - [Quickstart: run the demo](#quickstart-run-the-demo)
 - [Command reference](#command-reference)
+- [Architecture](#architecture)
 - [Defect classes](#defect-classes)
 - [Repository structure](#repository-structure)
 - [Models](#models)
@@ -101,6 +126,20 @@ lsof -ti tcp:8000 | xargs kill   # backend
 lsof -ti tcp:3000 | xargs kill   # dashboard (use the port it printed)
 ```
 
+## Architecture
+
+### System architecture
+
+The dashboard talks to the FastAPI backend over HTTP and WebSocket. The backend runs YOLO inference, applies the quality rules, and stores results in SQLite and on disk. The offline scripts train and evaluate the models and export the JSON the dashboard displays.
+
+![Fig. 1: System architecture](docs/figures/fig1_system_architecture.svg)
+
+### Video processing pipeline
+
+An uploaded video is validated, registered, and handed to a background worker. The worker runs YOLO11n on every stride frame, reuses the previous boxes on the frames in between, writes the annotated frames, and streams progress and defect alerts to the dashboard. At the end it transcodes the video to H.264, applies the quality rules, and marks the inspection complete.
+
+![Fig. 2: Video processing pipeline](docs/figures/fig2_video_processing_pipeline.svg)
+
 ## Defect classes
 
 | ID | Class | Description |
@@ -122,7 +161,7 @@ lsof -ti tcp:3000 | xargs kill   # dashboard (use the port it printed)
 ├── configs/train/                # one YAML per model version (model, data, hyperparameters)
 ├── dashboard/                    # Next.js dashboard: evaluation results and video inspection
 ├── data/                         # generated datasets (git-ignored)
-├── docs/                         # evaluation report, experiment plans and results, API docs
+├── docs/                         # evaluation report, experiment plans and results, API docs, figures/
 ├── models/                       # model registry, see models/README.md
 │   ├── best_v2.pt                # recommended detector, used by the backend
 │   └── v1_yolo11n_baseline/ ...  # registered versions: weights, config, metrics, model card
