@@ -3,5 +3,9 @@ torch
 kagglehub
 pyyaml
 opencv-python
+pillow
 matplotlib
 pandas
+fastapi
+uvicorn>=0.30
+python-multipart
