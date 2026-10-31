@@ -9,6 +9,7 @@ Detects and classifies surface defects on hot-rolled steel strips. The project h
 ## Contents
 
 - [Quickstart: run the demo](#quickstart-run-the-demo)
+- [Command reference](#command-reference)
 - [Defect classes](#defect-classes)
 - [Repository structure](#repository-structure)
 - [Models](#models)
@@ -42,6 +43,63 @@ Open the dashboard and go to **Video inspection**. Upload `data/raw/ps7_test_ima
 - If port 3000 is taken, Next.js uses the next free port (3001, and so on). The terminal prints the URL.
 - If the backend runs somewhere other than `http://localhost:8000`, start the dashboard with `NEXT_PUBLIC_INSPECT_API_URL=http://host:port npm run dev`.
 - To check the backend, open `http://localhost:8000/health`. The interactive API docs are at `http://localhost:8000/docs`.
+
+## Command reference
+
+Run every command from the repository root unless it starts with `cd`. Lines marked "first time only" install dependencies.
+
+### Run the demo
+
+```bash
+# Terminal 1: backend on http://localhost:8000
+cd steel-defect-backend
+python -m venv .venv && .venv/bin/pip install -r requirements.txt   # first time only
+.venv/bin/python run.py
+
+# Terminal 2: dashboard on http://localhost:3000
+cd dashboard
+npm install                                                         # first time only
+npm run dev
+```
+
+### Train, evaluate and predict
+
+```bash
+pip install -r requirements.txt                                # first time only
+python scripts/prepare_neu_det.py                              # download and build the dataset
+python scripts/train.py configs/train/v1_yolo11n_baseline.yaml # train a version
+python scripts/evaluate.py v1_yolo11n_baseline                 # test-set metrics
+python scripts/predict.py v1_yolo11n_baseline path/to/images/  # predict on images
+```
+
+Training is slow without a GPU. The original runs used a Tesla T4 on Google Colab.
+
+### Evaluate every model and refresh the dashboard data
+
+```bash
+python scripts/evaluate_all.py           # writes reports/eval_all/
+python scripts/export_dashboard_json.py  # updates dashboard/data/evaluation.json
+```
+
+### Run the tests
+
+```bash
+cd steel-defect-backend
+.venv/bin/pip install pytest httpx       # first time only
+.venv/bin/python -m pytest tests
+
+cd ../dashboard
+npm run typecheck
+```
+
+### Stop the servers
+
+Press `Ctrl+C` in each terminal. If a server was started in the background, stop whatever is listening on its port:
+
+```bash
+lsof -ti tcp:8000 | xargs kill   # backend
+lsof -ti tcp:3000 | xargs kill   # dashboard (use the port it printed)
+```
 
 ## Defect classes
 
