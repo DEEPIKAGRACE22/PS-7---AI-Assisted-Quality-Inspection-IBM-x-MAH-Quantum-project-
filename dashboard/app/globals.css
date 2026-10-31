@@ -434,8 +434,6 @@ td:first-child, th:first-child { padding-left: 0.75rem; }
 .band-secondary .section-head h2 { font-size: clamp(1.25rem, 2.4vw, 1.7rem); }
 .band-secondary .section-head { margin-bottom: 1.5rem; }
 
-/* Casting classification is a different task, so it gets its own frame */
-.casting-band { border-top: 2px solid var(--ink); }
 .kind-chip {
   display: inline-block; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.1em;
   text-transform: uppercase; padding: 0.3rem 0.65rem; border-radius: 999px;
