@@ -22,3 +22,10 @@ venv/
 
 # Backend runtime data (uploads, annotated output, SQLite)
 steel-defect-backend/storage/
+
+# Node
+node_modules/
+.next/
+
+# Local virtualenvs
+.venv-*/

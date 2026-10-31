@@ -1,6 +1,6 @@
 # Model Evaluation Report: All Models in the Repo
 
-Date: 2026-10-29. Every checkpoint in `models/`, plus the casting classifier in `casting_defect_classification_package.zip`, was re-evaluated on a single machine with one script, so the numbers can be compared directly.
+Date: 2026-10-29. Every checkpoint in `models/`, plus the casting classifier in `assets/casting/casting_defect_classification_package.zip`, was re-evaluated on a single machine with one script, so the numbers can be compared directly.
 
 **Conclusion:** among the NEU-DET detectors, `models/best_v2.pt` (hard-example mining) scores highest on the test split and detects the most crazing defects. Its lead is 0.01–0.03 mAP. It does not hold on the validation split, where the original `v1_yolo11n_baseline` scores best, so no detector clearly beats the others. `best (1).pt` and `best_v1.pt` are clearly weaker. Every detector misses most crazing defects. The casting classifier misses 35% of defective parts on its held-out test set, which is far below the 99.5% accuracy its README claims.
 
@@ -12,7 +12,7 @@ Date: 2026-10-29. Every checkpoint in `models/`, plus the casting classifier in 
 | `v1r_yolo11n_baseline_long_s0/s1/s2` | NEU-DET detection | full train split, AdamW, up to 100 epochs | yes |
 | `v2_yolo11n_severstal_pretrain` | Severstal detection (4 classes) | Severstal tiles | yes (intermediate only) |
 | `v3_yolo11n_severstal_ft_s0/s1/s2` | NEU-DET detection | v2, then fine-tuned on NEU-DET | yes |
-| `models/best_v1.pt` | NEU-DET detection | 50% of train split (`ps7_train_and_evaluate.ipynb`) | no |
+| `models/best_v1.pt` | NEU-DET detection | 50% of train split (`notebooks/ps7_train_and_evaluate.ipynb`) | no |
 | `models/best_v2.pt` | NEU-DET detection | best_v1's 50%, plus the hardest 50% of the remaining pool | no |
 | `models/best (1).pt` | NEU-DET detection | fine-tuned 25 epochs from an unknown `best.pt` | no, origin undocumented |
 | `casting_defect_classifier(_final).keras` | casting defect classification (`defective` / `ok`) | Kaggle casting `train/` folder | no |
