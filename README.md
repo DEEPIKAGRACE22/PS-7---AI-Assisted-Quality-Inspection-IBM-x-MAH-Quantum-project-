@@ -38,7 +38,7 @@ npm install
 npm run dev
 ```
 
-Open the dashboard and go to **Video inspection**. Upload `data/raw/ps7_test_images_raw_upload.mp4`, a 36-second test video. You get it back with every defect boxed, its confidence, and the video timestamp burned in. The dashboard raises an alert as soon as a defect is found.
+Open the dashboard and go to **Video inspection**. Upload `assets/videos/ps7_test_images_raw_upload.mp4`, a 36-second test video. You get it back with every defect boxed, its confidence, and the video timestamp burned in. The dashboard raises an alert as soon as a defect is found.
 
 - If port 3000 is taken, Next.js uses the next free port (3001, and so on). The terminal prints the URL.
 - If the backend runs somewhere other than `http://localhost:8000`, start the dashboard with `NEXT_PUBLIC_INSPECT_API_URL=http://host:port npm run dev`.
@@ -116,13 +116,12 @@ lsof -ti tcp:3000 | xargs kill   # dashboard (use the port it printed)
 
 ```
 ├── assets/
+│   ├── videos/                   # test input video for the inspection demo
 │   ├── video_demo/               # annotated demo video and its detection CSVs
 │   └── casting/                  # casting defect classifier package (separate task)
 ├── configs/train/                # one YAML per model version (model, data, hyperparameters)
 ├── dashboard/                    # Next.js dashboard: evaluation results and video inspection
-├── data/
-│   ├── raw/                      # raw test video for the inspection demo (tracked)
-│   └── neu_yolo/                 # generated dataset (git-ignored)
+├── data/                         # generated datasets (git-ignored)
 ├── docs/                         # evaluation report, experiment plans and results, API docs
 ├── models/                       # model registry, see models/README.md
 │   ├── best_v2.pt                # recommended detector, used by the backend
