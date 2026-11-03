@@ -2,6 +2,8 @@
 
 Date: 2026-11-03. This plan follows the interim review (high failure rate against an 83% success target). It builds on `docs/MODEL_EVALUATION_REPORT.md` and replaces the ordering in `docs/IMPROVEMENT_PLAN.md`, whose Phase 1 was marked "skipped" without recorded results.
 
+> **Team of 6:** work is split into streams A–F in [section 13](#13-team-split-6-members). Fill in the owner names there.
+
 ## 1. Where we are
 
 Numbers are from `reports/eval_all/overall.csv` (NEU-DET test split, 180 images, 416 boxes, conf 0.25).
@@ -121,3 +123,41 @@ Week 4     Phase F, Phase G, final 3-seed comparison and write-up
 - Registered model folder with config, metrics and model card
 - Corrected casting documentation (or an explicit out-of-scope note)
 - Updated `docs/MODEL_EVALUATION_REPORT.md`
+
+## 13. Team split (6 members)
+
+Each stream owns its phases, branches and outputs. Branch names: `<stream>/<topic>` (for example `b/yolo11s-sweep`). One PR per experiment or change, reviewed by someone from another stream.
+
+| Stream | Owner | Scope | Plan sections | Main outputs |
+|--------|-------|-------|---------------|--------------|
+| **A. Evaluation and integration** | _name_ | Success definition, scoring script, failure taxonomy, re-split, seeds protocol, `experiments.csv`, model registration, clean-clone check | Step 0, Phase A | `scripts/score_cases.py`, `reports/error_analysis/`, frozen split, `experiments.csv`, registered `models/v4_...` |
+| **B. Model capacity and training** | _name_ | `yolo11s/m`, image size, schedule, flips and rotations, mosaic/mixup | Phase B | Baseline v3 config, 3-seed results table |
+| **C. Weak classes** | _name_ | Label audit, CLAHE, oversampling, hard-example mining on full data, loss weights | Phase C | Corrected labels, crazing and rolled-in_scale recall results |
+| **D. Data and robustness** | _name_ | GC10-DET, negative (clean) images, production-like augmentation, robustness test set | Phase D | New dataset builds under `data/`, robustness test split |
+| **E. Inference, backend and dashboard** | _name_ | Threshold tuning, TTA and ensemble, quality-rule validation, ONNX export, latency and load tests, CI smoke test, Git LFS | Phase E, Phase G | Per-class thresholds, latency/throughput report, CI workflow |
+| **F. Casting classifier and documentation** | _name_ | Notebook bug fix, README correction, retrain or mark out of scope; keep README, evaluation report and model cards in sync; final write-up | Phase F, Deliverables | Corrected casting package, updated `MODEL_EVALUATION_REPORT.md`, final report |
+
+### Dependencies and order
+
+```
+Day 1-2    A: Step 0 (blocks everyone: split, scoring rule, experiments.csv format)
+           B, C, D, E, F can read code and prepare while waiting, but do not report numbers yet
+Week 1     A: Phase A       B: B1, B2 first       F: casting fix       E: clean-clone check, latency baseline
+Week 2     C: label audit first (C1), then C2-C4   D: negatives and robustness set   B: remaining sweeps
+Week 3     C and B merge best settings into one config (A reviews)   E: thresholds, TTA, quality rules on that model
+Week 4     A: final 3-seed comparison   E: load test and CI   F: final report
+```
+
+### Shared rules
+
+1. **One frozen split and one scoring script (from A).** Nobody reports results from their own metric or split.
+2. **Every run goes into `experiments.csv`** with stream, config diff, seed, val and test scores.
+3. **Change one variable per run, 3 seeds.** Select on val, never on test.
+4. **Handoffs:** B's best config and C's label fixes and CLAHE setting are combined into a single "Baseline v4" config, owned by A. D's new data and E's thresholds are evaluated on that config only.
+5. **CLAHE and any preprocessing must be added to the backend** (stream E) in the same PR cycle that C adopts it, or the deployed model will not match the evaluated one.
+6. **Weekly 30-minute sync:** each stream reports its numbers against the agreed pass rate and any blocker.
+7. **Pull `origin/main` and branch from it before starting any change.**
+
+### Load balance note
+
+A and E carry the most integration work. If either falls behind, F (documentation is lighter in weeks 1–2) picks up the clean-clone and CI tasks.
