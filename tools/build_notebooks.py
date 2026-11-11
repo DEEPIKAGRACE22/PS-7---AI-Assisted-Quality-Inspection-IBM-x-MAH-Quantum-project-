@@ -57,7 +57,7 @@ SOURCE_MODE = "url"            # "url" | "gdown" | "kaggle_input" | "local_dir"
 # --- SOURCE_MODE = "url": paste the DIRECT download link(s) copied from the SciDB downloads list (one per file).
 #     Links can expire: run this notebook right after copying. Leave the list empty to stop at the check below.
 DOWNLOAD_URLS = [
-    # "PASTE_DIRECT_DOWNLOAD_URL_HERE",
+    "https://china.scidb.cn/download?fileId=4c8b0313f67ab43151749e46f9ceebcf&traceId=812ec6ac-6ffc-4c46-bbcf-336226f8853d",
 ]
 GDOWN_IDS_OR_URLS = []                          # SOURCE_MODE = "gdown"
 KAGGLE_INPUT_DIR = "/kaggle/input/CHANGE-ME"    # SOURCE_MODE = "kaggle_input" (dataset attached via Add Input)
