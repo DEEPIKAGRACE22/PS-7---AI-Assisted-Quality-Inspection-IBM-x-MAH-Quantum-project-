@@ -89,7 +89,7 @@ rows = L.disk_report([P["work"], P["persist"], *SCRATCH])
 EXTRACT_ROOT = Path(max(SCRATCH, key=lambda p: L.free_gb(p))) / "msdd_data"
 print("extract target:", EXTRACT_ROOT)'''),
     code('''ARCHIVES, DATA_DIR = [], None
-EXT = {"zip": ".zip", "7z": ".7z", "tar": ".tar", "gzip": ".tar.gz", "bzip2": ".tar.bz2", "xz": ".tar.xz"}
+EXT = {"zip": ".zip", "rar": ".rar", "7z": ".7z", "tar": ".tar", "gzip": ".tar.gz", "bzip2": ".tar.bz2", "xz": ".tar.xz"}
 
 def fetch_archives():
     global ARCHIVES

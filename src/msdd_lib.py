@@ -168,6 +168,19 @@ def download_gdown(url_or_id: str, dest: str | Path) -> Path:
     return Path(out)
 
 
+def ensure_7z():
+    """RAR/7z need the 7z binary (apt p7zip-full). Installed on demand on Colab/Kaggle (both run as root or with sudo)."""
+    if shutil.which('7z'):
+        return
+    print('installing p7zip-full for RAR/7z extraction ...')
+    cmd = ['apt-get', 'install', '-y', '-q', 'p7zip-full']
+    if os.geteuid() != 0:
+        cmd = ['sudo'] + cmd
+    subprocess.check_call(['sh', '-c', 'apt-get update -q >/dev/null 2>&1; ' + ' '.join(cmd) + ' >/dev/null 2>&1'])
+    if not shutil.which('7z'):
+        raise RuntimeError('7z is not available; install p7zip-full manually')
+
+
 def verify_archive(path: str | Path, expected_bytes: int | None = None) -> dict:
     path = Path(path)
     size = path.stat().st_size
@@ -185,7 +198,8 @@ def verify_archive(path: str | Path, expected_bytes: int | None = None) -> dict:
             res['first_bad'] = bad
     elif res['kind'] in ('tar', 'gzip', 'bzip2', 'xz'):
         res['ok'] = tarfile.is_tarfile(path)
-    elif res['kind'] == '7z':
+    elif res['kind'] in ('7z', 'rar'):
+        ensure_7z()
         res['ok'] = subprocess.call(['7z', 't', '-bd', str(path)], stdout=subprocess.DEVNULL) == 0
     else:
         res['ok'] = False
@@ -206,7 +220,8 @@ def extract_archive(path: str | Path, out_dir: str | Path, delete_after: bool = 
     elif kind in ('tar', 'gzip', 'bzip2', 'xz'):
         with tarfile.open(path) as t:
             t.extractall(out_dir, filter='data') if sys.version_info >= (3, 12) else t.extractall(out_dir)
-    elif kind == '7z':
+    elif kind in ('7z', 'rar'):
+        ensure_7z()
         subprocess.check_call(['7z', 'x', '-y', f'-o{out_dir}', str(path)])
     else:
         raise RuntimeError(f'cannot extract {path}: {kind}')
