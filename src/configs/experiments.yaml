@@ -1,0 +1,96 @@
+reference_hyp:
+  epochs: 80
+  patience: 100
+  batch: 16
+  imgsz: 640
+  optimizer: auto
+  seed: 0
+  deterministic: true
+  single_cls: false
+  rect: false
+  cos_lr: false
+  close_mosaic: 8
+  amp: true
+  fraction: 1.0
+  freeze: null
+  multi_scale: false
+  dropout: 0.0
+  lr0: 0.01
+  lrf: 0.01
+  momentum: 0.937
+  weight_decay: 0.0005
+  warmup_epochs: 1
+  warmup_momentum: 0.8
+  warmup_bias_lr: 0.1
+  box: 7.5
+  cls: 0.5
+  dfl: 1.5
+  label_smoothing: 0.1
+  nbs: 64
+  hsv_h: 0.07
+  hsv_s: 0.5
+  hsv_v: 0.4
+  degrees: 15
+  translate: 0.1
+  scale: 0.4
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.2
+  fliplr: 0.5
+  mosaic: 0.9
+  mixup: 0.1
+  copy_paste: 0.0
+  auto_augment: randaugment
+  erasing: 0.4
+  crop_fraction: 1.0
+  iou: 0.7
+  max_det: 300
+  pretrained: true
+
+# Experiments E1..E8. `reference_hyp` is copied verbatim from
+# reference_repo/runs/detect/YOLOv8l_tscm_pifm/args.yaml (paths, device, workers, name removed).
+# Keys that the pinned ultralytics rejects are dropped at run time and printed (label_smoothing, crop_fraction, ...).
+common: {}
+rules:
+  many_small_boxes_frac: 0.25      # E3 uses imgsz 1280 instead of 960 if >= this fraction of boxes have min side < 16 px at 640
+  rare_class_ratio: 0.10           # E4 oversamples if (rarest class images / most common class images) < this
+experiments:
+  E1:
+    description: "Baseline A: yolov8l.pt, reference hyperparameters, seed 0"
+    model: yolov8l.pt
+    data_variant: baseline_a
+  E2:
+    description: "Baseline B: the repo pipeline (TSCM mixer output rendered to images, then stock yolov8l). Only if FEASIBILITY.md + audit say it is reproducible."
+    base: E1
+    data_variant: baseline_b
+    requires: baseline_b_ready          # notebook 02 refuses (loudly) until Phase 2 sets this up
+  E3:
+    description: "E1 at larger input size (960, or 1280 if the audit shows many small boxes)"
+    base: E1
+    imgsz: auto_from_audit
+  E4:
+    description: "best so far + rare-class handling (image-level repeat-factor oversampling; copy_paste is a no-op without segment labels)"
+    base: best
+    oversample: auto_from_audit
+  E5:
+    description: "best so far, early stopping patience 20, up to 150 epochs"
+    base: best
+    train_args: {epochs: 150, patience: 20}
+  E6:
+    description: "E1 recipe on YOLO11l"
+    base: E1
+    model: yolo11l.pt
+  E7:
+    description: "RT-DETR-l, same epoch budget as E1"
+    base: E1
+    model: rtdetr-l.pt
+  E8a: {description: "E1 repeated, seed 1", base: E1, seed: 1}
+  E8b: {description: "E1 repeated, seed 2", base: E1, seed: 2}
+  E8c: {description: "best-so-far repeated, seed 1", base: best, seed: 1}
+  E8d: {description: "best-so-far repeated, seed 2", base: best, seed: 2}
+  # Optional quota savers: same change at yolov8m, compared against E1m. Rerun the winner at l size.
+  E1m: {description: "yolov8m baseline for the m-size ablations", base: E1, model: yolov8m.pt}
+  E3m: {description: "E1m at larger imgsz", base: E1m, imgsz: auto_from_audit}
+  E4m: {description: "E1m + oversampling", base: E1m, oversample: auto_from_audit}
+order: [E1, E2, E3, E4, E5, E6, E7, E8a, E8b, E8c, E8d]
+optional: [E1m, E3m, E4m]

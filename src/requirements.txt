@@ -1,0 +1,14 @@
+# Pinned to the versions tested in the local smoke test (Python 3.13, CPU, macOS).
+# torch, torchvision, numpy, pandas are intentionally NOT pinned: Kaggle/Colab ship CUDA builds and
+# reinstalling them is slow and can break the driver match. Tested locally with
+# torch 2.15.0, torchvision 0.29.2, numpy 2.5.4, pandas 3.1.1.
+ultralytics==8.4.210
+kornia==0.9.0
+pytorch_msssim==1.0.0
+torchsummary==1.5.1
+opencv-python-headless
+numpy
+pandas
+matplotlib
+pyyaml
+tqdm
