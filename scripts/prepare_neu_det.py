@@ -5,12 +5,18 @@ original training set as the test split (seed 42), and the original validation
 set is kept as val.
 
 Usage:
-    python scripts/prepare_neu_det.py [--output data/neu_yolo]
+    python scripts/prepare_neu_det.py [--output data/neu_yolo] [--annotations corrected.zip]
+
+With --annotations (a folder or .zip of VOC XML files), each image uses the XML
+with the same filename stem from that set instead of the original annotation.
+The split is unchanged, so results stay comparable across label versions.
 """
 
 import argparse
 import random
 import shutil
+import tempfile
+import zipfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -107,6 +113,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--output", type=Path, default=Path("data/neu_yolo"))
     parser.add_argument("--source", type=Path, help="Existing NEU-DET folder (skips download)")
+    parser.add_argument("--annotations", type=Path, help="Folder or .zip of replacement VOC XML annotations")
     args = parser.parse_args()
 
     if args.source:
@@ -120,6 +127,23 @@ def main():
         if xml_path.stem in xml_by_stem:
             raise ValueError(f"Duplicate XML annotation: {xml_path.stem}")
         xml_by_stem[xml_path.stem] = xml_path
+
+    if args.annotations:
+        ann_dir = args.annotations
+        if ann_dir.suffix.lower() == ".zip":
+            ann_dir = Path(tempfile.mkdtemp(prefix="neu_ann_"))
+            with zipfile.ZipFile(args.annotations) as zf:
+                zf.extractall(ann_dir)
+        replacements = {}
+        for xml_path in ann_dir.rglob("*.xml"):
+            if xml_path.stem in replacements:
+                raise ValueError(f"Duplicate corrected annotation: {xml_path.stem}")
+            replacements[xml_path.stem] = xml_path
+        missing = set(xml_by_stem) - set(replacements)
+        if missing:
+            raise ValueError(f"{len(missing)} images have no corrected annotation, e.g. {sorted(missing)[:3]}")
+        xml_by_stem = {stem: replacements[stem] for stem in xml_by_stem}
+        print(f"Using {len(xml_by_stem)} annotations from {args.annotations}")
 
     splits = make_splits(source)
 
