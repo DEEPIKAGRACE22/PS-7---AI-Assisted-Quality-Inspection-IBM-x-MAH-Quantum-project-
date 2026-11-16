@@ -1,0 +1,2 @@
+Model,Dataset,Precision,Recall,mAP50,mAP50_95
+v4_yolo26s_neu_det_s2,data/neu_yolo/data.yaml,0.776856867652579,0.7118607195892311,0.773206429823793,0.44373743896878753
