@@ -1,0 +1,2 @@
+Model,Dataset,Split,Images,Accuracy,Macro_Precision,Macro_Recall
+v5_yolo26s_cls_neu,data/neu_cls,val,360,1.0,1.0,1.0

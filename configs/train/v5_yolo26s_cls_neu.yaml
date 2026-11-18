@@ -1,0 +1,29 @@
+# v5: YOLO26s-cls (official ImageNet checkpoint) as a 6-class image classifier on NEU-DET.
+# Same train/val/test image assignment as v4 (scripts/prepare_neu_cls.py); v4 is the baseline.
+version: v5_yolo26s_cls_neu
+description: YOLO26s-cls image classifier on NEU-DET, grayscale-tuned augmentation, cosine LR, 60 epochs.
+
+model: yolo26s-cls.pt
+data: data/neu_cls
+
+train:
+  epochs: 60
+  imgsz: 224
+  batch: 64
+  seed: 0
+  deterministic: true
+  patience: 20
+  workers: 0
+  optimizer: auto
+  cos_lr: true
+  warmup_epochs: 3
+  amp: true
+  hsv_h: 0.0
+  hsv_s: 0.2
+  hsv_v: 0.3
+  degrees: 5.0
+  translate: 0.1
+  scale: 0.3
+  fliplr: 0.5
+  flipud: 0.5
+  device: 0

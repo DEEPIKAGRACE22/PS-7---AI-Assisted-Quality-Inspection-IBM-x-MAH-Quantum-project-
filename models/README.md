@@ -25,6 +25,7 @@ All metrics are on the NEU-DET held-out test split (180 images, seed 42). Seeded
 | [v2_yolo11n_severstal_pretrain](v2_yolo11n_severstal_pretrain/MODEL_CARD.md) | yolo11n (COCO) | Pretrained on Severstal tiles (4 classes, not evaluated on NEU-DET) | n/a | n/a | n/a | n/a | n/a | n/a |
 | [v3_yolo11n_severstal_ft](v3_yolo11n_severstal_ft_s2/MODEL_CARD.md) (×3) | v2 | Fine-tuned on NEU-DET | 0.720 ± 0.007 | 0.704 ± 0.008 | 0.747 ± 0.008 | 0.422 ± 0.011 | 0.393 ± 0.060 | 0.636 ± 0.052 |
 | [v4_yolo26s_neu_det](v4_yolo26s_neu_det_s1/MODEL_CARD.md) (×3) | yolo26s (COCO) | YOLO26s, grayscale-tuned augmentation, cosine LR, 150 epochs. Release: seed 1 (`best_v4_yolo26s.pt`, test mAP50-95 0.440) | 0.755 ± 0.049 | 0.703 ± 0.018 | 0.760 ± 0.028 | 0.431 ± 0.018 | 0.423 ± 0.065 | 0.636 ± 0.044 |
+| [v5_yolo26s_cls_neu](v5_yolo26s_cls_neu/MODEL_CARD.md) | yolo26s-cls (ImageNet) | Image classifier (6 classes, no boxes). Image-level accuracy: val 1.000, test 1.000 (v4 detector: 0.992 / 1.000). Table columns below do not apply | n/a | n/a | n/a | n/a | n/a | n/a |
 
 **Reading the table:** compare v3 against **v1r**, which has the same training schedule. The v3 gain in mAP50-95 (+0.015) is within seed-to-seed noise, and the original v1 (a single run) scores as well as either. Seed variation alone moves crazing AP50 by up to 0.12.
 
