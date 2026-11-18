@@ -1,0 +1,8 @@
+true,crazing,inclusion,patches,pitted_surface,rolled-in_scale,scratches,(none)
+crazing,60,0,0,0,0,0,0
+inclusion,0,60,0,0,0,0,0
+patches,0,0,60,0,0,0,0
+pitted_surface,0,0,3,57,0,0,0
+rolled-in_scale,0,0,0,0,60,0,0
+scratches,0,0,0,0,0,60,0
+accuracy,0.9916666666666667,conf=0.05,tta=False,agg=sum

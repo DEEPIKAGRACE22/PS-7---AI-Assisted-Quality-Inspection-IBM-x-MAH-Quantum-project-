@@ -36,5 +36,16 @@ Three seeds (0, 1, 2) were trained. **Seed 1 is released because it has the best
 - Seed-to-seed spread is large (test mAP50-95 0.410 to 0.444), as with the earlier models. The test set is small, so gaps under about 0.02 are within noise. The mean (0.431) is only slightly above the YOLO11n versions (0.407 to 0.422); the released seed's 0.440 is the best of the three seeds' best-by-val pick, not a guaranteed gain.
 - Labels: the "corrected" annotations in `NEU_DET_Dataset_Annotation_Audit_Report/neu_corrected_annotations.zip` are byte-identical to the Kaggle originals (1800/1800 XMLs), so the standard labels were used. `prepare_neu_det.py --annotations` is available if a genuinely different set is supplied.
 - Crazing (recall 0.33) and rolled-in_scale remain the weak classes.
-- Exported to ONNX and run on test images as a sanity check.
+- ONNX: `../best_v4_yolo26s_e2e.onnx` is exported with the end-to-end head (output `[1, 300, 6]`, NMS-free). The earlier untracked `../best_v4_yolo26s.onnx` has a raw `[1, 10, 8400]` head and scores lower (test mAP50 0.746, mAP50-95 0.363 vs 0.779 / 0.440 for the `.pt`). On val, the end-to-end ONNX gives mAP50 0.691 / mAP50-95 0.325 against 0.752 / 0.394 for the `.pt`, so box scores still drop after export; the cause was not traced. Image-level accuracy is identical to the `.pt` on val (357/360).
 - Images are 200x200 grayscale, upscaled to 640 for training and inference.
+
+## Image-level accuracy (one defect class per image)
+
+Each image gets one class: the detection class with the largest summed confidence (`scripts/eval_image_accuracy.py`, conf 0.05). The true class is the filename prefix. conf 0.05 was chosen on val (conf 0.25 gives 351/360 = 0.975 there); the test split was evaluated once with that setting. Val was also used to pick this seed's checkpoint, so val is slightly optimistic.
+
+| Split | Images | Correct | Accuracy |
+|-------|--------|---------|----------|
+| val | 360 | 357 | 0.992 |
+| test | 180 | 180 | 1.000 |
+
+The only val errors are 3 `pitted_surface` images predicted as `patches`. Test has 30 images per class, so 180/180 still leaves a 95% lower bound of about 0.98. This is a different metric from box mAP: boxes are still weak for crazing (recall 0.33) and rolled-in_scale. Metrics: `metrics/image_accuracy_{val,test}.csv`.

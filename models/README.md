@@ -28,6 +28,13 @@ All metrics are on the NEU-DET held-out test split (180 images, seed 42). Seeded
 
 **Reading the table:** compare v3 against **v1r**, which has the same training schedule. The v3 gain in mAP50-95 (+0.015) is within seed-to-seed noise, and the original v1 (a single run) scores as well as either. Seed variation alone moves crazing AP50 by up to 0.12.
 
+## Image-level accuracy
+
+Collapsing each image's detections to one class (`scripts/eval_image_accuracy.py`), `v4_yolo26s_neu_det_s1` scores 357/360 (0.992) on val and 180/180 (1.000) on test. Details in its [model card](v4_yolo26s_neu_det_s1/MODEL_CARD.md).
+
 ## Other files
+
+`best_v4_yolo26s_e2e.onnx` is the end-to-end ONNX export of `best_v4_yolo26s.pt`. Box mAP is lower than the `.pt` after export; see the v4 model card.
+
 
 `best (1).pt` in this folder is an older upload whose origin is not documented. It is not a registered version and is not used by any script.

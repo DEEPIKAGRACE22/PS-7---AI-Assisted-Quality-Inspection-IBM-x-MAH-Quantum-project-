@@ -112,6 +112,17 @@ Confusion matrix (rows are true labels, columns are predictions): defective → 
 4. **Casting classifier:** fix the evaluation bug in the notebook and correct the README. Then tune the decision threshold for defect recall on a validation split, or switch to a pretrained backbone such as MobileNet or EfficientNet.
 5. **Cleanup:** delete `best (1).pt`, or document where it came from. Deduplicate the two casting `.keras` files.
 
+## 6a. Image-level accuracy of `v4_yolo26s_neu_det_s1` (added)
+
+The report above scores boxes (mAP). If the question is only "which defect type is in this image", collapse each image's detections to one class (largest summed confidence, conf 0.05, `scripts/eval_image_accuracy.py`) and compare with the filename class. The setting was chosen on val; test was evaluated once.
+
+| Split | Images | Accuracy |
+|-------|--------|----------|
+| val | 360 | 0.992 (357/360) |
+| test | 180 | 1.000 (180/180) |
+
+Box quality is a separate matter: the same model has test mAP50 0.779 and mAP50-95 0.440, with weak crazing recall (0.33). The `.pt` is the reference. The end-to-end ONNX (`models/best_v4_yolo26s_e2e.onnx`) keeps the same image accuracy on val but loses box mAP (val mAP50-95 0.325 vs 0.394), and the older raw-head ONNX scores lower again (test mAP50-95 0.363). Reproduce: `python scripts/eval_image_accuracy.py v4_yolo26s_neu_det_s1 --split test --conf 0.05`.
+
 ## 7. Caveats
 
 - 180 test images give intervals of about ±0.04 on mAP50, so differences below about 0.03 should not be treated as real.
